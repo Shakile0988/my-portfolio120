@@ -1,0 +1,2497 @@
+{
+  "name": "SEO Keyword Reseach",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "84bcbf6d-65cd-45ba-904e-235d62bf2d23",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2000,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.dataforseo.com/v3/keywords_data/google_ads/search_volume/live",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "=[{\n  \"location_name\": \"United States\",\n  \"language_code\": \"en\",\n  \"keywords\": [\"{{ $json.Keywords }}\"]\n}]\n",
+        "options": {}
+      },
+      "id": "3c7d7215-2ff0-44de-b407-ac537add7b81",
+      "name": "HTTP SearchVolume",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        -420,
+        -360
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ajaXUi36aQNTqEFh",
+          "name": "DataForSEO"
+        },
+        "httpBasicAuth": {
+          "id": "ug4PwsfFTQ5QkOgr",
+          "name": "DataforSEO2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.dataforseo.com/v3/serp/google/organic/live/advanced",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "=[{\n  \"location_name\": \"United States\",\n  \"language_code\": \"en\",\n  \"keyword\": \"{{ $json.Keywords }}\",\n  \"device\": \"desktop\",\n  \"depth\": 100,\n  \"parse\": true\n}]\n\n",
+        "options": {}
+      },
+      "id": "98773b36-8135-4f8f-bcf3-746fbbae8561",
+      "name": "HTTP Google SERP",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        -440,
+        560
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ajaXUi36aQNTqEFh",
+          "name": "DataForSEO"
+        },
+        "httpBasicAuth": {
+          "id": "ug4PwsfFTQ5QkOgr",
+          "name": "DataforSEO2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.dataforseo.com/v3/keywords_data/google_ads/keywords_for_keywords/live",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "=[{\n  \"location_name\": \"United States\",\n  \"language_code\": \"en\",\n  \"keywords\": [\"{{ $json.Keywords }}\"]\n}]\n",
+        "options": {}
+      },
+      "id": "36a176ab-b2ed-4292-8fa6-1c17a66da10a",
+      "name": "HTTP Keyword Suggestions",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        -100,
+        2020
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "ug4PwsfFTQ5QkOgr",
+          "name": "DataforSEO2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.dataforseo.com/v3/serp/screenshot",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "=[{\"task_id\":\"{{ $json[\"tasks\"][0][\"id\"] }}\"}]",
+        "options": {}
+      },
+      "id": "3c028d1f-c767-4039-8b49-36c146be6ee3",
+      "name": "HTTP Screenshot",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        120,
+        260
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "ug4PwsfFTQ5QkOgr",
+          "name": "DataforSEO2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.dataforseo.com/v3/serp/google/local_finder/live/advanced",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "=[{\n  \"location_name\": \"United States\",\n  \"language_code\": \"en\",\n  \"keyword\": \"{{ $json[\"tasks\"][0][\"data\"][\"keyword\"] }}\"\n}]\n",
+        "options": {}
+      },
+      "id": "c92d3111-f5c9-4ce0-849a-5bd154fbc589",
+      "name": "HTTP Local Finder",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        -100,
+        1720
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "ug4PwsfFTQ5QkOgr",
+          "name": "DataforSEO2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.dataforseo.com/v3/backlinks/summary/live",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "=[{\"target\":\"{{ $json.top_domain }}\"}]",
+        "options": {}
+      },
+      "id": "08bfbe4b-85b7-4cf8-9977-e0665ebb7b32",
+      "name": "HTTP Backlinks",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        140,
+        1460
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "ug4PwsfFTQ5QkOgr",
+          "name": "DataforSEO2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ",
+          "mode": "list",
+          "cachedResultName": "Keyword Research",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1966727209,
+          "mode": "list",
+          "cachedResultName": "Keywords",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ/edit#gid=1966727209"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -1760,
+        520
+      ],
+      "id": "280bea71-108c-4b57-ae13-77d08d2baba4",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ugpyltO1vW4sTXNh",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const result = $json[\"tasks\"]?.[0]?.result?.[0] || {};\nconst output = [];\n\nlet hasSnippet = false;\n\nif (result.items) {\n  for (const item of result.items) {\n    if (item.type === 'featured_snippet') {\n      output.push({ json: {\n        Keyword: result.keyword,\n        \"Snippet Title\": item.title,\n        URL: item.url,\n        Domain: item.domain,\n        \"Snippet Text\": item.description ? item.description.substring(0, 200) : ''\n      }});\n      hasSnippet = true;\n      break;\n    }\n  }\n}\n\nif (!hasSnippet) {\n  output.push({ json: {\n    Keyword: result.keyword,\n    \"Snippet Title\": '',\n    URL: '',\n    Domain: '',\n    \"Snippet Text\": ''\n  }});\n}\n\nreturn output;\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -100,
+        -20
+      ],
+      "id": "da596be3-6d45-446b-8e81-252647b62fff",
+      "name": "Extract Snippet1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const result = $json[\"tasks\"]?.[0]?.result?.[0];\nconst features = {\n  Keyword: result?.keyword || \"\",\n  Featured_Snippet: false,\n  People_Also_Ask: false,\n  Local_Pack: false,\n  Video: false,\n  Image_Pack: false,\n  Top_Stories: false,\n  Knowledge_Panel: false,\n  Shopping_Ads: false\n};\n\nif (result?.items) {\n  for (const item of result.items) {\n    const type = item.type?.toLowerCase();\n    if (type.includes(\"featured_snippet\")) features.Featured_Snippet = true;\n    if (type.includes(\"people_also_ask\")) features.People_Also_Ask = true;\n    if (type.includes(\"local\") || type.includes(\"map\")) features.Local_Pack = true;\n    if (type.includes(\"video\")) features.Video = true;\n    if (type.includes(\"image\")) features.Image_Pack = true;\n    if (type.includes(\"top_stories\") || type.includes(\"news\")) features.Top_Stories = true;\n    if (type.includes(\"knowledge\")) features.Knowledge_Panel = true;\n    if (type.includes(\"shopping\")) features.Shopping_Ads = true;\n  }\n}\n\nreturn [{ json: features }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -100,
+        560
+      ],
+      "id": "1517df19-4d40-4809-895e-33250ed4f5a7",
+      "name": "Detect SERP Features1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const result = $json[\"tasks\"][0][\"result\"][0];\nconst output = [];\n\nif (result.items) {\n  for (const item of result.items) {\n    if (item.type === 'organic') {\n      output.push({\n        json: {\n          Keyword: result.keyword,\n          Rank: item.rank_group,\n          Position: item.rank_absolute,\n          Title: item.title || '',\n          URL: item.url || '',\n          Domain: item.domain || '',\n          Breadcrumb: item.breadcrumb || '',\n          Snippet: item.description || ''\n        }\n      });\n    }\n  }\n}\n\nreturn output;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -100,
+        840
+      ],
+      "id": "d8ee89e5-cede-4bcf-ae5c-a907a8e96abb",
+      "name": "Extract Organic"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $json[\"tasks\"][0][\"result\"][0];\nlet topDomain = null;\nif (data.items) {\n  for (const item of data.items) {\n    if (item.type === 'organic') {\n      topDomain = item.domain;\n      break;\n    }\n  }\n}\nreturn {\n  json: {\n    Keyword: data.keyword,\n    top_domain: topDomain\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -100,
+        1460
+      ],
+      "id": "a5a0b982-ab17-4df8-a2ee-10444d29c1b8",
+      "name": "Extract Top Domain"
+    },
+    {
+      "parameters": {
+        "jsCode": "const result = $json.tasks?.[0]?.result?.[0];\nconst output = [];\nif (result && result.items) {\n  for (const biz of result.items) {\n    if (biz.type === 'local_pack' || biz.type === 'map') {\n      output.push({ json: {\n        Keyword: result.keyword || ($json.Keyword || ''),\n        \"Business Name\": biz.title || '',\n        Details: biz.description || ''\n      } });\n    }\n  }\n}\nreturn output;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        140,
+        1720
+      ],
+      "id": "fd00e659-67aa-4eb3-99e6-9cc5834a8323",
+      "name": "Extract Local"
+    },
+    {
+      "parameters": {
+        "jsCode": "const tasks = $json.tasks;\nconst output = [];\n\nif (tasks && tasks[0] && tasks[0].result) {\n  const suggestions = tasks[0].result;\n  const keyword = tasks[0].data.keywords ? tasks[0].data.keywords[0] : ($json.Keyword || '');\n\n  for (const sug of suggestions) {\n    output.push({\n      Keyword: keyword,\n      \"Suggested Keyword\": sug.keyword,\n      \"Search Volume\": sug.search_volume || 0,\n      CPC: sug.cpc || 0,\n      Competition: sug.competition || sug.competition_level || ''\n    });\n  }\n}\n\nreturn output;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        140,
+        2020
+      ],
+      "id": "7eee3574-85d4-42a1-a1fb-5b09bdcb6e0d",
+      "name": "Extract Suggestions"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.dataforseo.com/v3/dataforseo_labs/google/related_keywords/live",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "=[{\n  \"location_name\": \"United States\",\n  \"language_code\": \"en\",\n  \"keyword\": \"{{ $json.Keywords }}\",\n  \"depth\": 1\n}]\n\n\n\n",
+        "options": {}
+      },
+      "id": "d18e848b-8b59-430e-a84d-80dcd6cb7f58",
+      "name": "HTTP Related Keywords",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        -1440,
+        -340
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ajaXUi36aQNTqEFh",
+          "name": "DataForSEO"
+        },
+        "httpBasicAuth": {
+          "id": "ug4PwsfFTQ5QkOgr",
+          "name": "DataforSEO2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.dataforseo.com/v3/dataforseo_labs/google/keyword_ideas/live",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "=[{\n  \"location_name\": \"United States\",\n  \"language_code\": \"en\",\n  \"keywords\": [\"{{ $json.Keywords }}\"],\n  \"limit\": 100\n}]\n",
+        "options": {}
+      },
+      "id": "cc00a7a4-4007-4ea9-bf5d-e167618ae6b9",
+      "name": "HTTP Keyword Ideas",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        -1440,
+        -60
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ajaXUi36aQNTqEFh",
+          "name": "DataForSEO"
+        },
+        "httpBasicAuth": {
+          "id": "ug4PwsfFTQ5QkOgr",
+          "name": "DataforSEO2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.dataforseo.com/v3/content_generation/generate_sub_topics/live",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "=[{\"topic\":\"{{ $json.Keywords }}\",\"max_sub_topics\":10}]",
+        "options": {}
+      },
+      "id": "b92b2821-8925-461d-98c0-35a634c1ffe5",
+      "name": "HTTP Subtopics",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        -1440,
+        260
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ajaXUi36aQNTqEFh",
+          "name": "DataForSEO"
+        },
+        "httpBasicAuth": {
+          "id": "ug4PwsfFTQ5QkOgr",
+          "name": "DataforSEO2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $json.tasks[0].result[0].items || [];\nlet allRelated = [];\n\nitems.forEach(item => {\n  const mainKeyword = item.keyword_data?.keyword || null;\n  const related = item.related_keywords || [];\n\n  related.forEach(keyword => {\n    allRelated.push({\n      MainKeyword: mainKeyword,\n      RelatedKeyword: keyword\n    });\n  });\n});\n\nreturn allRelated;\n\n\n\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1200,
+        -340
+      ],
+      "id": "79a1ec2d-16a6-437c-9cf6-e8151595bc65",
+      "name": "Extract Related Keywords"
+    },
+    {
+      "parameters": {
+        "jsCode": "const topic = $input.first().json.tasks[0].data.topic || '';\nconst subs = $json.tasks[0].result[0].sub_topics || [];\n\nreturn subs.map((s, idx) => ({\n  Keyword: topic,\n  Subtopic: s,\n  Rank: idx + 1\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1200,
+        260
+      ],
+      "id": "8aafd19c-6a17-4379-9df9-f1aa6e8ba03a",
+      "name": "Extract Subtopics"
+    },
+    {
+      "parameters": {
+        "jsCode": "const kw = $json.tasks[0].result[0].seed_keywords?.[0] || $json.Keyword || '';\nconst items = $json.tasks[0].result || [];\nconst out = [];\n\nitems.forEach(res => {\n  (res.items || []).forEach(i => {\n    out.push({\n      Keyword: kw,\n      IdeaKeyword: i.keyword,\n      SV: i.search_volume || null,\n      CPC: i.cpc || null,\n      Competition: i.competition || null\n    });\n  });\n});\n\nreturn out;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1200,
+        -60
+      ],
+      "id": "03fcd370-1d5b-4eda-bf6a-e29ea9418bae",
+      "name": "Extract Keyword Ideas"
+    },
+    {
+      "parameters": {
+        "jsCode": "const keyword = $json.tasks?.[0]?.result?.[0]?.keyword || '';\nconst monthly = $json.tasks?.[0]?.result?.[0]?.monthly_searches || [];\nconst defaultCpc = $json.tasks?.[0]?.result?.[0]?.cpc || 0;\n\nreturn monthly.map(m => ({\n  Keyword: keyword,\n  Year: m.year,\n  Month: m.month,\n  Searches: m.search_volume,\n  CPC: m.cpc !== undefined ? m.cpc : defaultCpc\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -100,
+        -360
+      ],
+      "id": "993936fb-803c-40ff-8f8c-dabfa68a7b45",
+      "name": "Extract Volume Trend"
+    },
+    {
+      "parameters": {
+        "jsCode": "const kw = $json.keyword || $json.Keyword || ($json.tasks && $json.tasks[0].keyword) || $json.tasks?.[0]?.result?.[0]?.keyword;\nconst topItems = $json.tasks?.[0]?.result?.[0]?.items || [];\nconst out = [];\n\ntopItems.forEach(section => {\n  // ✅ PAS: People Also Search op hoofdniveau\n  if (section.type === 'people_also_search_element') {\n    out.push({\n      Type: \"PAS\",\n      Keyword: kw,\n      Related: section.keyword,\n      Rank: section.rank_group || section.rank\n    });\n  }\n\n  // ✅ Geneste PAA: People Also Ask elementen\n  if (Array.isArray(section.items)) {\n    section.items.forEach(i => {\n      if (i.type === 'people_also_ask_element') {\n        out.push({\n          Type: \"PAA\",\n          Keyword: kw,\n          Question: i.title\n        });\n      }\n    });\n  }\n});\n\nreturn out;\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -100,
+        1140
+      ],
+      "id": "5760dd9e-efce-4e2c-8732-1c851d99f507",
+      "name": "Extract PAA/PAS"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ",
+          "mode": "list",
+          "cachedResultName": "Keyword Research",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1357600484,
+          "mode": "list",
+          "cachedResultName": "Overview",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ/edit#gid=1357600484"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Keyword": "={{ $json.Keyword }}",
+            "Competition": "={{ $json.Average_Competition }}",
+            "Avg Search Volume": "={{ $json.Avg_Search_Volume }}",
+            "CPC": "={{ $json.Average_CPC }}",
+            "Has Snippet": "={{ $json.Has_Snippet }}",
+            "SERP Features": "={{ $json.SERP_Features }}",
+            "Top Organic Domains": "={{ $json.Top_Organic_Domain }}",
+            "Screenshot URL": "={{ $json.Screenshot_URL }}",
+            "#PAA": "={{ $json.PAA_Question }}",
+            "#Local": "={{ $json.Local_Business_Name }}",
+            "Referring Domains": "={{ $json.Referring_Domains }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Keyword",
+              "displayName": "Keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Avg Search Volume",
+              "displayName": "Avg Search Volume",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "CPC",
+              "displayName": "CPC",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Competition",
+              "displayName": "Competition",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Has Snippet",
+              "displayName": "Has Snippet",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SERP Features",
+              "displayName": "SERP Features",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Top Organic Domains",
+              "displayName": "Top Organic Domains",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "#PAA",
+              "displayName": "#PAA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "#Local",
+              "displayName": "#Local",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Referring Domains",
+              "displayName": "Referring Domains",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Screenshot URL",
+              "displayName": "Screenshot URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1380,
+        700
+      ],
+      "id": "2fc0d43c-c493-4f80-b9a3-9681ee834af5",
+      "name": "Overview",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ugpyltO1vW4sTXNh",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ",
+          "mode": "list",
+          "cachedResultName": "Keyword Research",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 282690701,
+          "mode": "list",
+          "cachedResultName": "Search Volume Trend",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ/edit#gid=282690701"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Keyword": "={{ $json.Keyword }}",
+            "Year": "={{ $json.Year }}",
+            "Month": "={{ $json.Month }}",
+            "Searches": "={{ $json.Searches }}",
+            "CPC": "={{ $json.CPC }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Keyword",
+              "displayName": "Keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Year",
+              "displayName": "Year",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Month",
+              "displayName": "Month",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Searches",
+              "displayName": "Searches",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "CPC",
+              "displayName": "CPC",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false,
+          "options": []
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        120,
+        -360
+      ],
+      "id": "3f1ec549-8c2e-4e34-8cfa-0dc35937c5d1",
+      "name": "Search Volume Trend",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ugpyltO1vW4sTXNh",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ",
+          "mode": "list",
+          "cachedResultName": "Keyword Research",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1313102974,
+          "mode": "list",
+          "cachedResultName": "Featured Snippets",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ/edit#gid=1313102974"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Keyword": "={{ $json.Keyword }}",
+            "Snippet Title": "={{ $json['Snippet Title'] }}",
+            "URL": "={{ $json.URL }}",
+            "Domain": "={{ $json.Domain }}",
+            "Snippet Text": "={{ $json['Snippet Text'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Keyword",
+              "displayName": "Keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Snippet Title",
+              "displayName": "Snippet Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "URL",
+              "displayName": "URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Domain",
+              "displayName": "Domain",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Snippet Text",
+              "displayName": "Snippet Text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false,
+          "options": []
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        120,
+        -20
+      ],
+      "id": "6b776b8a-a12d-4e8a-aa74-3a2ad2a2f86c",
+      "name": "Featured Snippets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ugpyltO1vW4sTXNh",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ",
+          "mode": "list",
+          "cachedResultName": "Keyword Research",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1323889712,
+          "mode": "list",
+          "cachedResultName": "SERP Features",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ/edit#gid=1323889712"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Keyword": "={{ $json.Keyword }}",
+            "Featured_Snippet": "={{ $json.Featured_Snippet }}",
+            "People_Also_Ask": "={{ $json.People_Also_Ask }}",
+            "Local_Pack": "={{ $json.Local_Pack }}",
+            "Video": "={{ $json.Video }}",
+            "Image_Pack": "={{ $json.Image_Pack }}",
+            "Top_Stories": "={{ $json.Top_Stories }}",
+            "Knowledge_Panel": "={{ $json.Knowledge_Panel }}",
+            "Shopping_Ads": "={{ $json.Shopping_Ads }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Keyword",
+              "displayName": "Keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Featured_Snippet",
+              "displayName": "Featured_Snippet",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "People_Also_Ask",
+              "displayName": "People_Also_Ask",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Local_Pack",
+              "displayName": "Local_Pack",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Video",
+              "displayName": "Video",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Image_Pack",
+              "displayName": "Image_Pack",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Top_Stories",
+              "displayName": "Top_Stories",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Knowledge_Panel",
+              "displayName": "Knowledge_Panel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Shopping_Ads",
+              "displayName": "Shopping_Ads",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        120,
+        560
+      ],
+      "id": "c2e9953d-f96e-4e68-89a1-b01df6b5facb",
+      "name": "SERP Features",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ugpyltO1vW4sTXNh",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ",
+          "mode": "list",
+          "cachedResultName": "Keyword Research",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 677237490,
+          "mode": "list",
+          "cachedResultName": "PAA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ/edit#gid=677237490"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Keyword": "={{ $json.Keyword }}",
+            "Type": "={{ $json.Type }}",
+            "Question": "={{ $json.Question }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Keyword",
+              "displayName": "Keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Type",
+              "displayName": "Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Question",
+              "displayName": "Question",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        120,
+        1140
+      ],
+      "id": "46155321-d041-495f-9742-73129c9d3d80",
+      "name": "PAA",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ugpyltO1vW4sTXNh",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ",
+          "mode": "list",
+          "cachedResultName": "Keyword Research",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1797280058,
+          "mode": "list",
+          "cachedResultName": "Organic Results",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ/edit#gid=1797280058"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Keyword": "={{ $json.Keyword }}",
+            "Rank": "={{ $json.Rank }}",
+            "Position": "={{ $json.Position }}",
+            "Title": "={{ $json.Title }}",
+            "URL": "={{ $json.URL }}",
+            "Domain": "={{ $json.Domain }}",
+            "Breadcrumb": "={{ $json.Breadcrumb }}",
+            "Snippet": "={{ $json.Snippet }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Keyword",
+              "displayName": "Keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Rank",
+              "displayName": "Rank",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Position",
+              "displayName": "Position",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "URL",
+              "displayName": "URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Domain",
+              "displayName": "Domain",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Breadcrumb",
+              "displayName": "Breadcrumb",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Snippet",
+              "displayName": "Snippet",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        120,
+        840
+      ],
+      "id": "f668078a-529d-4d61-9d88-f536e446a016",
+      "name": "Organic Results",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ugpyltO1vW4sTXNh",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ",
+          "mode": "list",
+          "cachedResultName": "Keyword Research",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 550769217,
+          "mode": "list",
+          "cachedResultName": "Local Results",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ/edit#gid=550769217"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Keyword": "={{ $json.Keyword }}",
+            "Business Name": "={{ $json['Business Name'] }}",
+            "Details": "={{ $json.Details }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Keyword",
+              "displayName": "Keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Business Name",
+              "displayName": "Business Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Details",
+              "displayName": "Details",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false,
+          "options": []
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        340,
+        1720
+      ],
+      "id": "74a88edf-29eb-4aad-83bf-c942dde1da56",
+      "name": "Local Results",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ugpyltO1vW4sTXNh",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ",
+          "mode": "list",
+          "cachedResultName": "Keyword Research",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1378869548,
+          "mode": "list",
+          "cachedResultName": "Suggestions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ/edit#gid=1378869548"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Keyword": "={{ $json.Keyword }}",
+            "Suggested Keyword": "={{ $json['Suggested Keyword'] }}",
+            "Search Volume": "={{ $json['Search Volume'] }}",
+            "CPC": "={{ $json.CPC }}",
+            "Competition": "={{ $json.Competition }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Keyword",
+              "displayName": "Keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Suggested Keyword",
+              "displayName": "Suggested Keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Search Volume",
+              "displayName": "Search Volume",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "CPC",
+              "displayName": "CPC",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Competition",
+              "displayName": "Competition",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        340,
+        2020
+      ],
+      "id": "de5a423e-57dd-4ccf-86c1-14d07853bfd6",
+      "name": "Suggestions",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ugpyltO1vW4sTXNh",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ",
+          "mode": "list",
+          "cachedResultName": "Keyword Research",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 170448196,
+          "mode": "list",
+          "cachedResultName": "Keyword Ideas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ/edit#gid=170448196"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Keyword": "={{ $json.Keyword }}",
+            "IdeaKeyword": "={{ $json.IdeaKeyword }}",
+            "SV": "={{ $json.SV }}",
+            "CPC": "={{ $json.CPC }}",
+            "Competition": "={{ $json.Competition }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Keyword",
+              "displayName": "Keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "IdeaKeyword",
+              "displayName": "IdeaKeyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SV",
+              "displayName": "SV",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "CPC",
+              "displayName": "CPC",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Competition",
+              "displayName": "Competition",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -980,
+        -60
+      ],
+      "id": "aa9378c9-f9b7-42fc-8f1f-8502770ef75a",
+      "name": "Keywords Ideas",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ugpyltO1vW4sTXNh",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ",
+          "mode": "list",
+          "cachedResultName": "Keyword Research",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1278595222,
+          "mode": "list",
+          "cachedResultName": "Subtopics",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ/edit#gid=1278595222"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Keyword": "={{ $json.Keyword }}",
+            "Subtopic": "={{ $json.Subtopic }}",
+            "Rank": "={{ $json.Rank }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Keyword",
+              "displayName": "Keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Subtopic",
+              "displayName": "Subtopic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Rank",
+              "displayName": "Rank",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -980,
+        260
+      ],
+      "id": "314d309e-b3d0-46b6-a03b-06a33edec4d7",
+      "name": "Subtopics",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ugpyltO1vW4sTXNh",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ",
+          "mode": "list",
+          "cachedResultName": "Keyword Research",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 260185468,
+          "mode": "list",
+          "cachedResultName": "Backlinks",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ/edit#gid=260185468"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Keyword": "={{ $('Extract Top Domain').item.json.Keyword }}",
+            "Domain": "={{ $('Extract Top Domain').item.json.top_domain }}",
+            "Backlinks Spam Score": "={{ $json.tasks[0].result[0].backlinks_spam_score }}",
+            "Referring Domains": "={{ $json.tasks[0].result[0].referring_main_domains }}",
+            "Backlinks": "={{ $json.tasks[0].result[0].backlinks }}",
+            "Country": "={{ $json.tasks[0].result[0].info.country }}",
+            "Platform": "={{ $json.tasks[0].result[0].info.platform_type[0] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Keyword",
+              "displayName": "Keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Domain",
+              "displayName": "Domain",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Backlinks",
+              "displayName": "Backlinks",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Referring Domains",
+              "displayName": "Referring Domains",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Backlinks Spam Score",
+              "displayName": "Backlinks Spam Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Country",
+              "displayName": "Country",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Platform",
+              "displayName": "Platform",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        380,
+        1460
+      ],
+      "id": "303b73bb-db1c-4f85-8095-74fff312eca8",
+      "name": "Backlinks",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ugpyltO1vW4sTXNh",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ",
+          "mode": "list",
+          "cachedResultName": "Keyword Research",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1669673679,
+          "mode": "list",
+          "cachedResultName": "Related Keywords",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1L5jRkI-Z0BqHfcxyBj5l5BS97drTkOnBPJLMD5bzfbQ/edit#gid=1669673679"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Main Keyword": "={{ $json.MainKeyword }}",
+            "Related Keyword": "={{ $json.RelatedKeyword }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Main Keyword",
+              "displayName": "Main Keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Related Keyword",
+              "displayName": "Related Keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -980,
+        -340
+      ],
+      "id": "5d2c6aa2-82a0-4643-8c14-67e6895635e4",
+      "name": "Related Keywords",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ugpyltO1vW4sTXNh",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nlet totalSearches = 0;\nlet totalCPC = 0;\nlet cpcCount = 0;\n\nfor (const item of items) {\n  const searches = item.json.Searches || 0;\n  const cpc = item.json.CPC;\n\n  totalSearches += searches;\n\n  if (typeof cpc === 'number') {\n    totalCPC += cpc;\n    cpcCount++;\n  }\n}\n\nconst avgSearches = totalSearches / items.length;\nconst avgCPC = cpcCount > 0 ? totalCPC / cpcCount : null;\n\nreturn [\n  {\n    json: {\n      Keyword: items[0].json.Keyword,\n      AverageSearchVolume: Math.round(avgSearches),\n      AverageCPC: avgCPC !== null ? Math.round(avgCPC * 100) / 100 : null,\n      DataPoints: items.length\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        340,
+        -360
+      ],
+      "id": "71f7cfd2-d7b5-4f03-aa8c-533ddf204e54",
+      "name": "average search volume and CPC"
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = [];\n\nfor (const item of $input.all()) {\n  const hasSnippet = item.json[\"Snippet Title\"] && item.json[\"Snippet Title\"].trim() !== \"\";\n  \n  output.push({\n    json: {\n      Keyword: item.json.Keyword,\n      HasSnippet: hasSnippet ? \"Yes\" : \"No\"\n    }\n  });\n}\n\nreturn output;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        340,
+        -20
+      ],
+      "id": "076789d9-b429-45d6-a2e7-d16572ff998e",
+      "name": "Yes or No"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\n\nconst serpFeatures = [\n  'Featured_Snippet',\n  'People_Also_Ask',\n  'Local_Pack',\n  'Video',\n  'Image_Pack',\n  'Top_Stories',\n  'Knowledge_Panel',\n  'Shopping_Ads'\n];\n\nconst found = serpFeatures.filter(key => item[key]);\n\nreturn [{\n  json: {\n    Keyword: item.Keyword,\n    Present_SERP_Features: found.join(', ') || 'None'\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        360,
+        560
+      ],
+      "id": "b8ded190-d8ce-4a96-91ba-0146174b6027",
+      "name": "Wich features exist"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nlet total = 0;\nlet count = 0;\n\nconst mapCompetition = {\n  LOW: 1,\n  MEDIUM: 2,\n  HIGH: 3\n};\n\nlet keyword = items[0]?.json?.Keyword || \"UNKNOWN\";\n\nlet avgLabel = \"UNKNOWN\";\n\nfor (const item of items) {\n  const raw = item.json.Competition?.toUpperCase();\n  const value = mapCompetition[raw];\n  if (value) {\n    total += value;\n    count++;\n  }\n}\n\nif (count > 0) {\n  const avg = total / count;\n  if (avg < 1.5) {\n    avgLabel = \"LOW\";\n  } else if (avg < 2.5) {\n    avgLabel = \"MEDIUM\";\n  } else {\n    avgLabel = \"HIGH\";\n  }\n}\n\nreturn [{\n  json: {\n    Keyword: keyword,\n    Average_Competition: avgLabel\n  }\n}];\n\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        540,
+        2020
+      ],
+      "id": "f201fdcc-3d35-425c-894d-4f257a18b42c",
+      "name": "Average competition"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nif (items.length === 0) {\n  return [];\n}\n\n// Neem alleen de eerste item (aangenomen dat het type PAA is)\nconst first = items.find(i => i.json.Type === 'PAA');\n\nreturn [{\n  json: {\n    Keyword: first?.json.Keyword || \"UNKNOWN\",\n    Question: first?.json.Question || \"No question found\"\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        380,
+        1140
+      ],
+      "id": "77720ece-04ae-4d2f-bcd1-254dc0d75cac",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nif (items.length === 0) {\n  return [];\n}\n\n// Neem alleen de eerste relevante entry\nconst first = items[0].json;\n\nreturn [{\n  json: {\n    Keyword: first.Keyword || \"UNKNOWN\",\n    Business_Name: first[\"Business Name\"] || \"No name found\",\n    Details: first.Details || \"No details\"\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        540,
+        1720
+      ],
+      "id": "22d63f16-462a-45a1-be11-ad0e727ce2c5",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "numberInputs": 8
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        1020,
+        580
+      ],
+      "id": "583dbab1-d03e-4cd3-bb6a-747bcba79c2b",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputs = $input.all();\nconst combined = {};\n\nfor (const item of inputs) {\n  Object.assign(combined, item.json);\n}\n\nreturn [{\n  json: {\n    Keyword: combined.Keyword || null,\n    Avg_Search_Volume: combined.AverageSearchVolume || null,\n    Average_CPC: combined.AverageCPC || null,\n    DataPoints: combined.DataPoints || null,\n    Has_Snippet: combined.HasSnippet || null,\n    SERP_Features: combined.Present_SERP_Features || null,\n    Top_Organic_Domain: combined.Domain || null,\n    PAA_Question: combined.Question || null,\n    Screenshot_URL: combined.tasks?.[0]?.result?.[0]?.url || null,\n    Backlinks: combined.Backlinks || null,\n    Referring_Domains: combined['Referring Domains'] || null,\n    Spam_Score: combined['Backlinks Spam Score'] || null,\n    Country: combined.Country || null,\n    Platform: combined.Platform || null,\n    Local_Business_Name: combined.Business_Name || null,\n    Local_Details: combined.Details || null,\n    Average_Competition: combined.Average_Competition || null\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        700
+      ],
+      "id": "f6018e44-9523-4431-b8c0-49d0f22b1170",
+      "name": "Restructure data"
+    },
+    {
+      "parameters": {
+        "content": "## Getting Keyword\n",
+        "height": 220,
+        "width": 440,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2040,
+        460
+      ],
+      "id": "27efc4e8-ef6f-4244-b5e8-f89ab5d1df18",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Creating Overview\n",
+        "height": 580,
+        "width": 820,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        720,
+        460
+      ],
+      "id": "b548d12b-16c5-4bde-9c62-096287837150",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "# Get Avertage Search Volume And CPC\n",
+        "height": 280,
+        "width": 1340
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -660,
+        -440
+      ],
+      "typeVersion": 1,
+      "id": "ecd8d090-1799-44c2-8c85-1385f64b0fb5",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "# Extract Featured Snippet\n\n",
+        "height": 280,
+        "width": 1340,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -660,
+        -140
+      ],
+      "typeVersion": 1,
+      "id": "98dba987-562e-442f-aa6f-f1c9294ec612",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "# Get Page Screenshot\n",
+        "height": 280,
+        "width": 1340,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -660,
+        160
+      ],
+      "typeVersion": 1,
+      "id": "91ddca1e-daec-45f1-b09f-7d226da88a63",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "# Serp Research\n",
+        "height": 280,
+        "width": 1340,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -660,
+        460
+      ],
+      "typeVersion": 1,
+      "id": "de71b3cf-7084-4b6c-abb0-022fd7c6ddd8",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "# Organic Results\n",
+        "height": 280,
+        "width": 1340,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -660,
+        760
+      ],
+      "typeVersion": 1,
+      "id": "4515bcd9-2608-4860-bf01-f915fd7e7f7f",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "# People Also Ask",
+        "height": 280,
+        "width": 1340,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -660,
+        1060
+      ],
+      "typeVersion": 1,
+      "id": "678b247c-03af-4e58-99cf-23c59513439a",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "# Get Top Domain Backlinks\n",
+        "height": 280,
+        "width": 1340,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -660,
+        1360
+      ],
+      "typeVersion": 1,
+      "id": "a57fef70-86f6-41ab-8037-0e9646f89ad1",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "# Local Results",
+        "height": 280,
+        "width": 1340,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -660,
+        1660
+      ],
+      "typeVersion": 1,
+      "id": "64afb7ed-87c0-450b-a3df-2922a5535861",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "# Suggested Keywords\n",
+        "height": 280,
+        "width": 1340,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -660,
+        1960
+      ],
+      "typeVersion": 1,
+      "id": "b6893598-49e9-412a-8b34-710da958f3b4",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "# Get Related Keywords\n",
+        "height": 280,
+        "width": 1340,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2040,
+        -440
+      ],
+      "typeVersion": 1,
+      "id": "b9e65c87-cc25-4334-a336-bb96f95ba1cf",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "# Get Keyword Ideas\n",
+        "height": 280,
+        "width": 1340,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2040,
+        -140
+      ],
+      "typeVersion": 1,
+      "id": "eddd6ee1-1ecd-4096-b9ff-389ad7bca959",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "content": "# Extract Subtopics\n",
+        "height": 280,
+        "width": 1340
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2040,
+        160
+      ],
+      "typeVersion": 1,
+      "id": "f1678692-0659-413a-abbf-4c088d90eef2",
+      "name": "Sticky Note13"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP SearchVolume": {
+      "main": [
+        [
+          {
+            "node": "Extract Volume Trend",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Google SERP": {
+      "main": [
+        [
+          {
+            "node": "HTTP Screenshot",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Local Finder",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Extract Organic",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Extract Snippet1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Detect SERP Features1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Extract Top Domain",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Extract PAA/PAS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Keyword Suggestions": {
+      "main": [
+        [
+          {
+            "node": "Extract Suggestions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Screenshot": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "HTTP Local Finder": {
+      "main": [
+        [
+          {
+            "node": "Extract Local",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Backlinks": {
+      "main": [
+        [
+          {
+            "node": "Backlinks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "HTTP Google SERP",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP SearchVolume",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Keyword Suggestions",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Related Keywords",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Keyword Ideas",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Subtopics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Snippet1": {
+      "main": [
+        [
+          {
+            "node": "Featured Snippets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detect SERP Features1": {
+      "main": [
+        [
+          {
+            "node": "SERP Features",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Organic": {
+      "main": [
+        [
+          {
+            "node": "Organic Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Top Domain": {
+      "main": [
+        [
+          {
+            "node": "HTTP Backlinks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Local": {
+      "main": [
+        [
+          {
+            "node": "Local Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Suggestions": {
+      "main": [
+        [
+          {
+            "node": "Suggestions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Related Keywords": {
+      "main": [
+        [
+          {
+            "node": "Extract Related Keywords",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Related Keywords": {
+      "main": [
+        [
+          {
+            "node": "Related Keywords",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Subtopics": {
+      "main": [
+        [
+          {
+            "node": "Extract Subtopics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Subtopics": {
+      "main": [
+        [
+          {
+            "node": "Subtopics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Keyword Ideas": {
+      "main": [
+        [
+          {
+            "node": "Extract Keyword Ideas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Keyword Ideas": {
+      "main": [
+        [
+          {
+            "node": "Keywords Ideas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Volume Trend": {
+      "main": [
+        [
+          {
+            "node": "Search Volume Trend",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract PAA/PAS": {
+      "main": [
+        [
+          {
+            "node": "PAA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Volume Trend": {
+      "main": [
+        [
+          {
+            "node": "average search volume and CPC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Featured Snippets": {
+      "main": [
+        [
+          {
+            "node": "Yes or No",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SERP Features": {
+      "main": [
+        [
+          {
+            "node": "Wich features exist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PAA": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Organic Results": {
+      "main": [
+        []
+      ]
+    },
+    "Backlinks": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 5
+          }
+        ]
+      ]
+    },
+    "Local Results": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Suggestions": {
+      "main": [
+        [
+          {
+            "node": "Average competition",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Related Keywords": {
+      "main": [
+        []
+      ]
+    },
+    "Subtopics": {
+      "main": [
+        []
+      ]
+    },
+    "average search volume and CPC": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Yes or No": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Wich features exist": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Average competition": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 7
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 6
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Restructure data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Restructure data": {
+      "main": [
+        [
+          {
+            "node": "Overview",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1c604e43-4648-4d70-b151-c66e63cdaef4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "50618e78906785f75ac298c8b090bb3bd6406a17352da71ebb8b85e6df90fa3a"
+  },
+  "id": "pVWoKnxJXiEf89Jw",
+  "tags": []
+}

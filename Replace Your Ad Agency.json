@@ -1,0 +1,1662 @@
+{
+  "name": "Create Advertisments",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "1dlsMpCpW0wWxfebj_wmdcGISgECFi2YL",
+            "mode": "list",
+            "cachedResultName": "Ad Inspiration",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1dlsMpCpW0wWxfebj_wmdcGISgECFi2YL"
+          }
+        },
+        "options": {}
+      },
+      "id": "a0d90850-a336-4492-9578-fdd5962e4be9",
+      "name": "Get Ad Inspirations",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1820,
+        80
+      ],
+      "executeOnce": false,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "9J5L7nZqBMdf9Q63",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "1zsddkaOAewhDGLAoocD6C7B9o2LdFmGQ",
+            "mode": "list",
+            "cachedResultName": "Product Image File",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1zsddkaOAewhDGLAoocD6C7B9o2LdFmGQ"
+          }
+        },
+        "options": {}
+      },
+      "id": "709ed4a1-f103-422d-bd70-5de7f66dc356",
+      "name": "Get Product Images",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1820,
+        360
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "9J5L7nZqBMdf9Q63",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{$json.id}}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "07468e6f-86ec-46db-b035-5028d2106733",
+      "name": "Download Inspiration",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1600,
+        80
+      ],
+      "executeOnce": false,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "9J5L7nZqBMdf9Q63",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{$json.id}}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "1a14079b-c327-49d0-9769-0ef754ee0939",
+      "name": "Download Product",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1600,
+        360
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "9J5L7nZqBMdf9Q63",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "text": "=# Overview  \nYou are an AI agent responsible for analyzing a product image to identify the main product, emotional tone, and key visual cues. Your output will be used to inform advertising styles and campaign direction.\n\n## Context  \n- The product image is intended for use in branding and marketing campaigns.  \n- The objective is to extract emotional and aesthetic insights to align with specific ad styles.  \n- The analysis will guide the creation of custom ad copy and visual strategies.\n\n## Instructions  \n1. Examine the uploaded product image.  \n2. Identify and describe the **main product** in focus.  \n3. Analyze the **core emotions** conveyed through colors, lighting, subject expressions, and overall composition.  \n4. Highlight any **visual style cues** such as minimalism, luxury, tech-inspired, organic, playful, etc.  \n5. Summarize findings in a structured format for easy integration into ad concept development.\n\n## Tools  \n- Vision/Image Analysis Module  \n- Emotional Tone Mapping  \n- Visual Style Identifier  \n\n## Examples  \n- Input: [Image of a luxury watch on a marble table with soft lighting]  \n- Output:  \n  - Main Product: Luxury wristwatch  \n  - Core Emotions: Sophistication, trust, timelessness  \n  - Visual Style Cues: Minimalist layout, luxury materials (marble), soft shadows, monochrome palette  \n\n## SOP (Standard Operating Procedure)  \n1. Load and inspect the image.  \n2. Detect and label the central product.  \n3. Map visual features (color, setting, subject) to emotional responses.  \n4. Identify artistic or stylistic direction.  \n5. Return a structured breakdown as bullet points.\n\n## Final Notes  \n- Focus on simplicity and clarity in emotional labeling (e.g., “calm”, “exciting”, “luxurious”).  \n- Avoid overinterpretation; stick to what is visually and contextually evident.  \n---\n",
+        "inputType": "base64",
+        "options": {
+          "maxTokens": 800
+        }
+      },
+      "id": "7f7e6cea-e36a-4071-a249-ed365312eedf",
+      "name": "Analyze Product",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -1380,
+        360
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "openAiApi": {
+          "id": "F6qdba8gGQvVY17E",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "output",
+        "options": {}
+      },
+      "id": "ed8ff391-8b18-4f39-a185-0a4928732398",
+      "name": "Split",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -120,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all();"
+      },
+      "id": "95dbae52-a901-4fac-ba48-ee97a0edf616",
+      "name": "Platform Adapter",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        80,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "d2919492-11b2-449e-aba1-17a18a93afa0",
+      "name": "Batch",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        300,
+        220
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "b6f909fc-c2b9-4ca2-9772-c55d1855213b",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        540,
+        240
+      ],
+      "webhookId": "f22504c1-1f65-4f62-8ee0-e29c76fda13e"
+    },
+    {
+      "parameters": {
+        "name": "={{ $('Wait').item.json.image_name }}",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1FP5gdIrutTZZRmQlA9ddlLpIIsYoiX8s",
+          "mode": "list",
+          "cachedResultName": "AI Created Ads",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1FP5gdIrutTZZRmQlA9ddlLpIIsYoiX8s"
+        },
+        "options": {}
+      },
+      "id": "fa899e59-e5eb-45f9-96cc-0aa84d3423cc",
+      "name": "Save to AI Ads Folder",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1200,
+        240
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "9J5L7nZqBMdf9Q63",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "AI Ad Creation",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Campaign Type",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Product Launch"
+                  },
+                  {
+                    "option": "Seasonal"
+                  },
+                  {
+                    "option": "Brand Awareness"
+                  },
+                  {
+                    "option": "Retargeting"
+                  },
+                  {
+                    "option": "Limited Time Offer"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Target Platform",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Facebook"
+                  },
+                  {
+                    "option": "Instagram"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Number Of Variation",
+              "fieldType": "number"
+            },
+            {
+              "fieldLabel": "Target Audience"
+            },
+            {
+              "fieldLabel": "Key Message/Offer"
+            },
+            {
+              "fieldLabel": "Emotional Tone",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Joy"
+                  },
+                  {
+                    "option": "Trust"
+                  },
+                  {
+                    "option": "Fear"
+                  },
+                  {
+                    "option": "Surprise"
+                  },
+                  {
+                    "option": "Sadness"
+                  },
+                  {
+                    "option": "Disgust"
+                  },
+                  {
+                    "option": "Anger"
+                  }
+                ]
+              },
+              "multiselect": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -2200,
+        240
+      ],
+      "id": "3281d75a-c034-48d2-b685-33f807344cc4",
+      "name": "AI Ad Form Submission",
+      "webhookId": "ddc9d77e-face-4833-babd-ef5ea1052e67"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -1040,
+        220
+      ],
+      "id": "fe0e2655-a666-45b7-9c1c-c65e153caba1",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/images/generations",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer API KEY"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "gpt-image-1"
+            },
+            {
+              "name": "prompt",
+              "value": "=Headline: {{ $json.headline }}\nPrompt: {{ $json.image_prompt }}\nEmotional Hook: {{ $json.emotion }}\nCTA: {{ $json.call_to_action }}\nPlatform: {{ $json.formatting_notes }}"
+            },
+            {
+              "name": "size",
+              "value": "1024x1024"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        760,
+        240
+      ],
+      "id": "f15e32dd-25e3-4264-9abe-a3c95f92c502",
+      "name": "Open AI Generate Image"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data[0].b64_json",
+        "options": {
+          "fileName": "={{$now.toMillis()}}.png"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        980,
+        240
+      ],
+      "id": "475233ab-52fb-4d6d-99ae-ab591335651a",
+      "name": "B64 String to File"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "text": "=# Overview  \nYou are a professional Facebook ads designer and conversion optimization expert. Your task is to analyze a static ad creative and extract key design and performance principles. The goal is to reverse-engineer the ad’s effectiveness in a non-product-specific way and generate a replicable template that can guide the creation of future high-converting Facebook ads.\n\n## Context  \n- Focus only on static ad creatives (not video or carousel).\n- Do not reference the specific product or brand shown in the ad.\n- The output will be used to inform the design of new ad creatives using the same visual and persuasive techniques.\n- Emphasize replicable design principles, emotional and psychological triggers, and visual communication best practices.\n\n## Instructions  \n1. Analyze the ad as a Facebook advertising and design expert.  \n2. Extract and describe the following categories in detail:  \n   - Visual Hierarchy  \n   - Color Psychology  \n   - Typography Analysis  \n   - Composition Elements  \n   - Persuasion Techniques  \n   - Emotional Triggers  \n   - Conversion Elements  \n   - Technical Specifications  \n3. Conclude with a summarized **Style Template Overview** for reuse.\n\n## Tools  \n- Color identification tools (if needed for hex codes)  \n- Visual analysis frameworks (e.g., Gestalt principles, F-pattern scanning)  \n- Persuasion and copywriting frameworks (e.g., AIDA, PAS)\n\n## Examples  \n- Input: [Upload or describe a static Facebook ad image]  \n- Output:  \n  - **Visual Hierarchy**: Bold headline top-center catches immediate attention, followed by a secondary text block and then the CTA button.  \n  - **Color Psychology**: Uses vibrant orange (#FFA500) to invoke urgency and energy. Contrast with dark navy (#1A1A2E) ensures high legibility.  \n  - **Typography**: Strong sans-serif font, with clear hierarchy — headline large and bold, body text medium, CTA small but high-contrast.  \n  - **Composition**: Grid layout with central alignment, ample white space around text blocks, balanced visual flow.  \n  - **Persuasion**: Includes star rating for social proof, limited-time badge for urgency, and visible CTA button.  \n  - **Emotional Triggers**: Evokes aspiration and security; appeals to viewers' desire to solve a common problem.  \n  - **Conversion Elements**: Clearly stated offer with benefit-oriented headline. CTA is visually distinct and action-driven.  \n  - **Technical**: 1080x1080px, high-resolution image with professional editing and clean graphic overlays.  \n  - **Style Template Overview**: Modern minimal layout, dominant color contrast, CTA emphasis, central alignment, text-to-image ratio ~30:70.\n\n## SOP (Standard Operating Procedure)  \n1. Load and review the ad creative thoroughly.  \n2. Start with identifying visual hierarchy by tracking eye flow.  \n3. Use color tools to extract and interpret the palette.  \n4. Examine typography: note font type, weights, and alignment.  \n5. Analyze layout and composition principles: spacing, balance, and structure.  \n6. Identify persuasive and emotional tactics used.  \n7. Check for technical specs: size, resolution, and style.  \n8. Draft a summarized template with visual and psychological design principles.\n\n## Final Notes  \n- Maintain a product-agnostic lens: focus on what works visually and emotionally across ad categories.  \n- Avoid specific brand names, slogans, or product mentions.  \n- Ensure that all findings help inform a universal ad template structure.\n---\n",
+        "inputType": "base64",
+        "options": {
+          "maxTokens": 500
+        }
+      },
+      "id": "98734dcb-79d5-406f-8c5e-c7abb15a6b7a",
+      "name": "Analyze Inspiration",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -1380,
+        80
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "openAiApi": {
+          "id": "F6qdba8gGQvVY17E",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=# Overview  \nYou are an AI agent tasked with generating {{ $('AI Ad Form Submission').first().json['Number Of Variation'] }} high-converting static ad prompts for {{ $('AI Ad Form Submission').first().json['Target Platform'] }}.  \nYour objective is to merge proven visual and messaging patterns from the **Ad Template Analysis** with product insights from **Product Details** to form a unified creative brief that fuels high-impact ad generation.\n\n## Context  \n- **Ad Template Analysis** outlines effective layout style, emotional tone, composition techniques, CTA patterns, and copywriting rhythm.  \n- **Product Details** define brand visuals, product benefits, color palette, logo usage, and emotional associations.  \n- Campaign type: {{ $('AI Ad Form Submission').first().json['Campaign Type'] }}  \n- Target audience: {{ $('AI Ad Form Submission').first().json['Target Audience'] }}  \n- Key message/offer: {{ $('AI Ad Form Submission').first().json['Key Message/Offer'] }}  \n- Emotional tones to express:  \n  - {{ $('AI Ad Form Submission').first().json['Emotional Tone'][0] || '' }}\n  - {{ $('AI Ad Form Submission').first().json['Emotional Tone'][1] || '' }}\n  - {{ $('AI Ad Form Submission').first().json['Emotional Tone'][2] || '' }}\n- All ad variations must comply with 2025 specs for {{ $('AI Ad Form Submission').first().json['Target Platform'] }} (e.g., 1.91:1 ratio, mobile-first design, minimal copy density).\n\n## Instructions  \n1. Integrate layout and storytelling frameworks from **Ad Template Analysis**.  \n2. Embed the visual identity, product attributes, and key offer from **Product Details**.  \n3. Ensure messaging aligns with the top 3 emotional tones specified.  \n4. Maintain clear visual hierarchy: product at the focal point, clean CTA positioning, and engaging headlines.  \n5. Generate {{ $('AI Ad Form Submission').first().json['Number Of Variation'] }} distinct static ad prompts meeting all criteria.\n\nEach variation must include:\n- **Visual Direction** – detailed composition, background type, lighting, perspective, product display, and any human interaction.  \n- **Headline** – platform-tailored message reflecting the campaign’s tone.  \n- **Supporting Copy** – optional benefit-driven or emotional subline.  \n- **Call-to-Action** – compelling CTA in the style defined by the inspiration template.  \n- **Tone Tag** – concise descriptor (e.g., “Bold”, “Playful”, “Empowering”).\n\n## Tools  \n- Ad Template Analysis  \n- Product Details  \n- AI Ad Form Submission (Platform, Audience, Tone, Campaign Type, Offer)\n\n## Examples  \n- Input: “Running shoe for Gen Z, TikTok, Lifestyle Campaign, Offer: Free 2-Day Shipping”  \n- Output:  \n```json\n{\n  \"visual\": \"Close-up of shoes pounding urban pavement at golden hour, blurred city in background, reflective shoelaces glowing\",\n  \"headline\": \"CHASE THE SUNSET\",\n  \"copy\": \"Run your city. Fast, free, fierce.\",\n  \"cta\": \"Shop the Drop\",\n  \"tone\": \"Aspirational\"\n}\n",
+              "role": "system"
+            },
+            {
+              "content": "=`Inpsiration Analysis`.  \n{{ $('Analyze Inspiration').first().json.content }}\n\n`Product Analysis`\n{{ $('Analyze Product').first().json.content }}"
+            }
+          ]
+        },
+        "options": {
+          "maxTokens": 1000
+        }
+      },
+      "id": "6e76c60b-57f6-48dd-96ce-265ff2361aac",
+      "name": "Creative Brief",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -820,
+        220
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "openAiApi": {
+          "id": "F6qdba8gGQvVY17E",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "id": "6324246f-2e15-43ea-91ce-3adcdde56945",
+      "name": "GPT-4 Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -500,
+        420
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "F6qdba8gGQvVY17E",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "[\n  {\n    \"image_name\": \"GlowRunner-NightCityBurst\",\n    \"headline\": \"“I never thought I’d love running until these.”\",\n    \"image_prompt\": \"A glowing pair of neon green running shoes in motion...\",\n    \"emotion\": \"From dread to empowerment — a total mindset shift through movement\",\n    \"call_to_action\": \"Run Free\",\n    \"formatting_notes\": \"1:1 ratio; Facebook & Instagram safe zones respected\"\n  },\n  {\n    \"image_name\": \"CozyCoffee-SunlightPour\",\n    \"headline\": \"“My mornings finally feel like *mine*.”\",\n    \"image_prompt\": \"Sun-drenched kitchen with a steaming cup of coffee on the counter...\",\n    \"emotion\": \"Creating calm from chaos — the magic of a morning ritual\",\n    \"call_to_action\": \"Savor the Start\",\n    \"formatting_notes\": \"1:1 ratio; Facebook & Instagram safe zones respected\"\n  }\n]\n"
+      },
+      "id": "be606f55-4465-47fa-9c34-6b57ecdf83f6",
+      "name": "Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        -280,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# 🎯 Objective  \nYou are an AI ad concept generator. Your task is to produce emotionally resonant, visually descriptive, and campaign-ready ad concepts for Facebook and Instagram using structured data inputs.\n\nEach concept must be formatted in JSON with the following fields:  \n- \"AdConcept\": wrap the JSON with this  \n- `imageName`: A descriptive image name  \n- `headline`: A bold, testimonial-style quote  \n- `prompt`: A visual scene description suitable for AI image generation (DALL·E, Midjourney)  \n- `emotional_hook`: The emotional transformation or psychological trigger  \n- `cta`: A short call-to-action that drives response  \n- `platform_details`: Notes for formatting (always 1:1 ratio; platform-specific considerations)\n\n---\n\n## 📦 Input Data Structure  \nYou’ll be provided with:  \n- **Creative Brief**:  \n`{{ $json.message.content }}`\n\n---\n\n## 📝 Instructions  \nGenerate `{{ $('AI Ad Form Submission').first().json['Number Of Variation'] }}` unique ad concepts.  \n\nFor each variation include:\n1. `imageName`: Clear, creative name for the concept  \n2. `headline`: Compelling testimonial-style quote  \n3. `prompt`: AI image prompt that includes:  \n   - Exact product placement  \n   - Background setting and lighting style  \n   - Color palette reflecting brand or mood  \n   - Suggested text overlay locations  \n   - Mood, tone, and visual style  \n4. `emotional_hook`: Psychological or emotional benefit triggered by the ad  \n5. `cta`: Simple, bold call-to-action  \n6. `platform_details`: Always specify \"1:1 ratio; Facebook & Instagram safe zones respected\"\n\nMaintain uniqueness across each variation while preserving visual and messaging consistency with the brand. Always incorporate specific product attributes drawn from the brief.\n\n---\n\n## 🧪 Example Output  \n```json\n\"AdConcept\": {\n  \"imageName\": \"GlowRunner-NightCityBurst\",\n  \"headline\": \"“I never thought I’d love running until these.”\",\n  \"prompt\": \"A glowing pair of neon green running shoes in motion, worn by a smiling woman mid-stride on a rain-slicked city street at night, ambient reflections on puddles, blurred lights in the background, bold 'FEEL THE RUSH' text placed in lower third with curved type, lighting is moody with high contrast edge glow, cool-toned color palette\",\n  \"emotional_hook\": \"From dread to empowerment — a total mindset shift through movement\",\n  \"cta\": \"Run Free\",\n  \"platform_details\": \"1:1 ratio; Facebook & Instagram safe zones respected\"\n}\n",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "id": "86cd8841-669c-426a-a838-00ee59c7d0ea",
+      "name": "Generate Ad Variations",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        -480,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "output",
+        "options": {}
+      },
+      "id": "6ee76d1b-be3a-4ad7-b1a6-2a5d7bf85a00",
+      "name": "Split Variations",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        620
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "29938dd0-8d89-4126-ad63-5292e04747c2",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        220,
+        620
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/images/generations",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer API Key"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "gpt-image-1"
+            },
+            {
+              "name": "prompt",
+              "value": "=Headline: {{ $json.headline }}\nPrompt: {{ $json.prompt }}\nEmotional Hook: {{ $json.emotional_hook }}\nCTA: {{ $json.cta }}"
+            },
+            {
+              "name": "size",
+              "value": "1024x1024"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8bb247a1-acaa-446b-9d55-d03ec959d379",
+      "name": "Generate Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        800,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "text": "=Quality check this generated ad:\n\n1. Is the product accurate based on: {{ $('Analyze Product Details').first().json.content }}?\n2. Is the text readable?\n3. Does it look professional?\n4. Rate quality 1-10\n\nIf below 7, explain what needs to be fixed.\n\nOutput in JSON \nScore\nImprovement",
+        "inputType": "base64",
+        "options": {}
+      },
+      "id": "06270e57-7009-4327-9241-ed4d34989e76",
+      "name": "Quality Check",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1200,
+        640
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "F6qdba8gGQvVY17E",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ +$json.output.Score }}",
+              "rightValue": 7,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              },
+              "id": "21c60013-893a-422c-bc65-419d88caadcb"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "3fdc8d12-e0a9-4c6f-a2c1-00f06c149a60",
+      "name": "Quality Pass?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "name": "=",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1FP5gdIrutTZZRmQlA9ddlLpIIsYoiX8s",
+          "mode": "list",
+          "cachedResultName": "AI Created Ads",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1FP5gdIrutTZZRmQlA9ddlLpIIsYoiX8s"
+        },
+        "options": {}
+      },
+      "id": "06e81556-37a2-4e44-a035-0b902ce29952",
+      "name": "Save to Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2160,
+        960
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "9J5L7nZqBMdf9Q63",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract items from previous node input and the original prompt\nconst inputs = $input.all();\nconst originalPrompt = $('Wait1').first().json.prompt;\nconst output = [];\n\nfor (let i = 0; i < inputs.length; i++) {\n  const item = inputs[i];\n  \n  // Get the score and improvement feedback from the new structure\n  const score = item.json.output?.Score || '';\n  const improvementFeedback = item.json.output?.Improvement || '';\n  \n  output.push({\n    json: {\n      ...item.json,\n      prompt: `${originalPrompt}\\n\\nQUALITY SCORE: ${score}\\n\\nIMPORTANT CORRECTIONS: ${improvementFeedback}\\n\\nEnsure photorealistic quality and accurate product representation.`,\n      attempt: 2,\n    },\n  });\n}\n\nreturn output;"
+      },
+      "id": "c2d3feba-ba9c-4893-b59e-c8db022c4eb8",
+      "name": "Enhance Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1860,
+        900
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "582909c2-1488-4f98-bd90-2206a8db0319",
+      "name": "Wait1",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        600,
+        640
+      ],
+      "webhookId": "34582c75-07e1-4021-b87b-3df5becaaa47"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data[0].b64_json",
+        "options": {
+          "fileName": "={{ $('Loop Over Items').item.json.name }}.png"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1000,
+        640
+      ],
+      "id": "f1fcf8e9-a843-46ae-a38f-cff026bb8017",
+      "name": "Convert To File"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.content }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "Score",
+              "description": "the score given",
+              "required": true
+            },
+            {
+              "name": "Improvement",
+              "description": "the improvment provided",
+              "required": true
+            }
+          ]
+        },
+        "options": {
+          "systemPromptTemplate": "You are an expert extraction algorithm.\nOnly extract relevant information from the text.\nIf you do not know the value of an attribute asked to extract, you may omit the attribute's value."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.1,
+      "position": [
+        1400,
+        640
+      ],
+      "id": "5f0a2ec3-6033-49ee-a54e-a4efe782db2a",
+      "name": "Information Extractor"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        860
+      ],
+      "id": "8e052956-9c1a-4e39-8e06-1eebc3db2740",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "gBvbGjhr6jAj28b3",
+          "name": "OpenRouter account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Split Variations": [
+      {
+        "json": {
+          "name": "Authority Focus",
+          "headline": "Trusted by Medical Professionals",
+          "prompt": "Medical professional as hero image, looking confident, with Blaze Performance Nasal Strips packaging prominently displayed in foreground at right bottom corner. Black background with subtle hexagonal pattern. Circular endorsement badge with text 'Trusted by Medical Professionals' on left side. Text hierarchy: headline top center in large white bold letters, below product name 'BLAZE PERFORMANCE NASAL STRIPS'. Accent text with '60 Strips' badge at bottom right with gray and white tones. Soft focused lighting highlighting product texture and professional’s face to evoke trust.",
+          "emotional_hook": "Reinforce confidence and reliability through expert endorsement, making users feel safe choosing Blaze.",
+          "cta": "Shop Now – Trusted Quality Awaiting You!"
+        }
+      },
+      {
+        "json": {
+          "name": "Lifestyle Application",
+          "headline": "Breathe Better. Perform Better.",
+          "prompt": "Authentic lifestyle shot featuring a fit individual applying Blaze nasal strip before a workout, wearing athletic gear. Black background with faint hexagonal pattern, subtle white and gray text overlays positioned top and middle to describe ease of use and comfort ('Easy to Apply', 'Comfortable Fit'). Product is side-centered showing individual and close-up on strip application. Lighting natural and dynamic emphasizing movement and energy.",
+          "emotional_hook": "Inspire active users with improved breathing and peak performance benefits.",
+          "cta": "Get Yours Today – Elevate Your Performance!"
+        }
+      },
+      {
+        "json": {
+          "name": "Product Close-Up",
+          "headline": "Experience the Difference",
+          "prompt": "Macro close-up of Blaze nasal strip’s curved shape and texture against a pure black background. Centered bold white 'BLAZE' logo above product image. Text in clean sans-serif below product: 'Performance Nasal Strips Designed to Last'. Clear shadow and highlights to show the strip’s smooth adhesive and flexible structure. Minimalistic layout with text centered beneath product, emphasizing product quality and innovation.",
+          "emotional_hook": "Highlight detailed quality and design for discerning customers seeking premium performance.",
+          "cta": "Try Blaze Now – Feel the Superior Fit!"
+        }
+      },
+      {
+        "json": {
+          "name": "Packaging Highlight",
+          "headline": "Performance Nasal Strips Designed to Last",
+          "prompt": "Dynamic angled hero shot of the full black resealable pouch with fiery flame logo and hexagonal pattern background. Callout boxes point to key features: 'Resealable Pouch', '60 Strips', and 'Flame Branding'. Text overlay at bottom center in bold white font. Background is black with soft gradient lighting to add depth and focus on product packaging details. Badge stating 'Approved Brand' positioned near callouts.",
+          "emotional_hook": "Showcase product durability and value packed for sustained use.",
+          "cta": "Order Now – Long-lasting Relief Awaits!"
+        }
+      },
+      {
+        "json": {
+          "name": "User Testimonial",
+          "headline": "See Why Thousands Trust Blaze",
+          "prompt": "Portrait of a satisfied customer smiling with quote bubble next to face containing testimonial: 'These strips improved my breathing and sleep!' Black background with hexagonal pattern faintly visible. Smaller Blaze Performance Nasal Strips package image placed bottom right corner. Headline in bold white at top center. Warm directional lighting on the subject to convey authenticity and satisfaction.",
+          "emotional_hook": "Build social proof through relatable customer experience and trust.",
+          "cta": "Join the Thousands – Shop Blaze Today!"
+        }
+      },
+      {
+        "json": {
+          "name": "Performance Promise",
+          "headline": "Optimize Your Breathing & Endurance",
+          "prompt": "Action shot of a runner with Blaze nasal strip applied, mid-stride in natural outdoor setting subtly blurred with black overlay to maintain brand palette. 'Trusted by Experts' badge top left. Text overlay bottom middle with headline in bold white and a sub-line emphasizing endurance and breath optimization. Product packaging small but visible near bottom right. Mood energetic and motivational with dynamic lighting to evoke movement.",
+          "emotional_hook": "Motivate users by linking Blaze to enhanced athletic performance and expert trust.",
+          "cta": "Try Blaze – Unleash Your Potential!"
+        }
+      },
+      {
+        "json": {
+          "name": "Minimalistic Blackout",
+          "headline": "Simple. Effective. Blaze.",
+          "prompt": "Minimalistic composition with pure black background. Only the nasal strip laid flat center with the 'BLAZE' flame logo above in bold white block lettering. Text headline 'Simple. Effective. Blaze.' centered below strip in clean white font. No other imagery, just a sleek, modern, and powerful look. Soft spotlight on product to accentuate shape and texture.",
+          "emotional_hook": "Appeal to those who value simplicity and high performance without distractions.",
+          "cta": "Experience Blaze – Get Yours Now!"
+        }
+      },
+      {
+        "json": {
+          "name": "Comparative Advantage",
+          "headline": "Go Black. Go Blaze.",
+          "prompt": "Side-by-side juxtaposition of Blaze Performance Nasal Strip and competitor nasal strip on black background. Blaze strip on left with sleek black curved shape and flame logo overlay; competitor strip on right looking plain and white. Callout boxes describe unique features like 'Flexible Adhesive', 'Sleek Design', and 'Enhanced Comfort' above Blaze strip. Bold white headline top centered. Packaging subtly displayed bottom right.",
+          "emotional_hook": "Encourage switching to a superior product by highlighting unique design and comfort advantages.",
+          "cta": "Switch Today – Feel the Blaze Difference!"
+        }
+      },
+      {
+        "json": {
+          "name": "Quantity Emphasis",
+          "headline": "More Strips. More Performance.",
+          "prompt": "Black background emphasizing large circular '60 Strips' badge in white and gray placed center surrounded by multiple Blaze nasal strips arranged neatly around the badge. Product packaging slightly blurred in background to maintain focus on quantity and strips. Headline top center in bold white font with subtext beneath: 'A pack that goes the distance.' Soft lighting creating a premium, valuable mood.",
+          "emotional_hook": "Drive value perception with quantity and lasting use for active lifestyles.",
+          "cta": "Stock Up Now – Performance that Lasts!"
+        }
+      },
+      {
+        "json": {
+          "name": "Seasonal/Occasion Based",
+          "headline": "Breathe Freely All Night",
+          "prompt": "Nighttime bedroom scene with person sleeping peacefully wearing Blaze nasal strip. Dim black background with subtle hexagonal texture and soft white glow around nose area to indicate breath flow. Trusted badge 'Trusted by Medical Professionals' bottom left. Text overlay top center with headline in white bold letters and subtext highlighting allergy season or sleep benefits. Product packaging image placed bottom right illuminated slightly.",
+          "emotional_hook": "Connect emotionally with customers seeking relief during sleep and allergy seasons.",
+          "cta": "Buy Now – Sleep Better Tonight!"
+        }
+      },
+      {
+        "json": {
+          "name": "Medical Endorsement Focus",
+          "headline": "Doctor-Recommended for Optimal Breathing",
+          "prompt": "Visual centers a medical professional wearing a white coat, holding Blaze Performance Nasal Strips packaging prominently to the right. A close-up image of the black nasal strip applied on a nose is inset on the left. Background is deep black (#000000) with subtle hexagonal pattern in very dark gray to add texture without detracting. Typography in bright white for headline at top, secondary tagline below: 'Improve airflow, breathe easier, perform better.' The Blaze logo in bright white and 'BLAZE PERFORMANCE NASAL STRIPS BLACK' label near packaging. A circular badge 'Trusted by Medical Professionals' in crisp white sits balanced on the lower left. CTA 'Shop Now' in white at bottom center. Lighting is cool and clinical, giving a trustworthy, clean feel. Font: bold modern sans-serif.",
+          "emotional_hook": "Builds strong trust and credibility through authoritative medical endorsement, reassuring users of product efficacy and safety.",
+          "cta": "Shop Now"
+        }
+      },
+      {
+        "json": {
+          "name": "Athlete Performance Focus",
+          "headline": "Trusted by Elite Athletes",
+          "prompt": "Image shows an athlete mid-run on a dark background (#000000), sweat glistening, black Blaze nasal strips clearly visible on nose. Product packaging is placed prominently bottom right with a rounded badge '60 STRIPS' in light gray near the package. Headline in bold white font at top, tagline beneath: 'Improve airflow, breathe easier, perform better.' The Flame logo and 'BLAZE PERFORMANCE NASAL STRIPS BLACK' label sit just above the CTA. CTA 'Boost Your Performance' in crisp white at bottom center. Lighting is dynamic with strong contrast to highlight performance and movement; color palette is monochrome with light gray accents.",
+          "emotional_hook": "Evokes strength, endurance, and high-performance motivation through athlete association.",
+          "cta": "Boost Your Performance"
+        }
+      },
+      {
+        "json": {
+          "name": "Value Pack Emphasis",
+          "headline": "Get 60 Strips for Long-Lasting Relief",
+          "prompt": "Central placement of large Blaze Performance Nasal Strips resealable pouch on a pure black background (#000000). A bold circular badge reading '60 STRIPS' is placed overlapping the package top right in bright white. Headline in large white font at top: 'Get 60 Strips for Long-Lasting Relief.' Below the headline is the smaller tagline 'Improve airflow, breathe easier, perform better.' The product name and black strip variant label appear centrally below the pouch. CTA 'Stock Up Now' is clearly placed at bottom center in a crisp white rounded button style. Overall feel is sleek, premium, and focused on value. Lighting highlights shiny packaging with soft shadow underneath for depth.",
+          "emotional_hook": "Focuses on value and longevity, appealing to practical buyers seeking lasting supply and reliability.",
+          "cta": "Stock Up Now"
+        }
+      },
+      {
+        "json": {
+          "name": "Comfort & Material Highlight",
+          "headline": "Flexible, Soft, & Comfortable – All Day Use",
+          "prompt": "Extremely close-up image of the black Blaze nasal strip texture and flexible adhesive on a person’s nose, placed center against a black background (#000000). Lighting is soft but detailed to show material texture and edges clearly. Headline in bold white font at top: 'Flexible, Soft, & Comfortable – All Day Use.' Secondary tagline sits just below the headline in medium gray: 'Breathe easier without irritation or discomfort.' Product packaging is subtly visible blurred in the bottom right corner to maintain focus on the strip material. '60 STRIPS' badge is placed near the packaging. CTA 'Feel the Comfort' is bottom center in a crisp white font. Mood is authentic, intimate, and reassuring.",
+          "emotional_hook": "Creates emotional comfort and trust by highlighting gentle material and wearability for all-day use.",
+          "cta": "Feel the Comfort"
+        }
+      },
+      {
+        "json": {
+          "name": "Sleek & Stylish",
+          "headline": "Blackout Performance Nasal Strips",
+          "prompt": "Minimalist visual focusing on a close-up of the black Blaze nasal strip on a nose, centered on a pure black background (#000000). The Flame logo appears bright white top left, with the product name 'BLAZE PERFORMANCE NASAL STRIPS BLACK' in bold near bottom center. '60 STRIPS' badge is placed bottom right. Headline 'Blackout Performance Nasal Strips' is large, bold, and white at the top, with a subtle tagline beneath: 'Enhanced style meets high performance.' The overall look is clean, stylish, and modern with high contrast and a sharp finish. Lighting accentuates the black strip's texture and the flame logo’s crisp outline. CTA 'Shop Black Edition' is bottom center in white, highlighted slightly with a soft glow.",
+          "emotional_hook": "Appeals to style-conscious customers who want premium performance with sleek aesthetics.",
+          "cta": "Shop Black Edition"
+        }
+      },
+      {
+        "json": {
+          "name": "Breathability & Airflow",
+          "headline": "Breathe Easier, Perform Better",
+          "prompt": "Dynamic ad with a central close-up of a nose wearing the black Blaze nasal strip with animated airflow lines softly illustrated around the nose area. Background is solid black (#000000) with a faint hexagonal pattern overlay in dark gray. Headline in large white font at top: 'Breathe Easier, Perform Better.' The secondary tagline 'Unlock superior airflow with Blaze' is below the headline. Product and packaging appear centered below with a visible '60 STRIPS' circular badge. Flame logo and product name are clearly visible near bottom. CTA 'Experience the Difference' is bright white at bottom center. Mood is energetic and empowering with a focus on improved breathing and performance.",
+          "emotional_hook": "Encourages feelings of enhanced vitality and active lifestyle through improved breathability visuals.",
+          "cta": "Experience the Difference"
+        }
+      },
+      {
+        "json": {
+          "name": "Lifestyle Integration",
+          "headline": "For Your Active, Everyday Life",
+          "prompt": "Visual of a user applying Blaze black nasal strip before heading out, set against a black background (#000000). The person is in casual, sporty attire, looking confident and ready. Product packaging is placed top right with the '60 STRIPS' badge beside it. Headline 'For Your Active, Everyday Life' in bold white font is at top with tagline 'Comfort and performance from morning till night' beneath in lighter gray. Flame logo and product name at bottom center alongside CTA 'Live Unstoppable' in crisp white. Lighting is natural yet contrasted to maintain sleek brand style. The overall atmosphere is relatable and motivating.",
+          "emotional_hook": "Emphasizes everyday usability and empowerment to live life without breathing limitations.",
+          "cta": "Live Unstoppable"
+        }
+      },
+      {
+        "json": {
+          "name": "Limited-Time Offer / Promotion",
+          "headline": "Limited Time – Save on Blaze Strips",
+          "prompt": "The Blaze Packaging is front and center on a stark black background (#000000) with a red discount badge overlapping the top left corner of the packaging reading ‘Save Now’. A large white circular badge '60 STRIPS' is positioned bottom right. Headline at top in bright white: 'Limited Time – Save on Blaze Strips.' Below the headline is a tagline 'Improve airflow, breathe easier, perform better.' Flame logo and product name appear near bottom center. CTA 'Order Before It’s Gone' is prominently placed in a bright white box with subtle glow to imply urgency. Lighting accentuates packaging gloss and badge vibrancy for maximum attention.",
+          "emotional_hook": "Triggers urgency and desire to act immediately through time-limited savings and strong visual cues.",
+          "cta": "Order Before It’s Gone"
+        }
+      },
+      {
+        "json": {
+          "name": "Scientific Innovation",
+          "headline": "Engineered for Maximum Performance",
+          "prompt": "Visual features the Blaze black nasal strip overlaid on a dark black background (#000000) with subtle hexagonal patterns and a stylized flame technology icon near top right. Headline 'Engineered for Maximum Performance' is in futuristic bold white font at top. Secondary tagline 'Advanced design for superior airflow and comfort' beneath in light gray. Product packaging and '60 STRIPS' badge sit bottom center. The strip's flexible material and adhesive are highlighted with glowing edge effects. Flame logo and product name positioned prominently near the bottom. CTA 'Discover the Science' is placed in a sleek white rounded button at bottom center. Mood is innovative, tech-forward, and confident.",
+          "emotional_hook": "Connects emotionally with users motivated by cutting-edge technology and scientific validation.",
+          "cta": "Discover the Science"
+        }
+      },
+      {
+        "json": {
+          "name": "Customer Testimonial Highlight",
+          "headline": "Loved by Thousands",
+          "prompt": "Split-frame visual with the left side showing a quote bubble in white containing a real user testimonial in dark gray text: 'These strips transformed my breathing during workouts!' The right side displays the Blaze black nasal strips packaging and a close-up of the strip applied on a nose. Background black (#000000) with subtle hexagonal pattern. Headline 'Loved by Thousands' is boldly placed top center in white, with the tagline 'Join the Movement breathing easier every day' below it. '60 STRIPS' badge near packaging, and Flame logo at bottom center. CTA 'Join the Movement' is large and placed at bottom in white with a subtle drop shadow for emphasis. The overall feel communicates relatable social proof and trust.",
+          "emotional_hook": "Harnesses social validation and trust by showcasing user satisfaction and community.",
+          "cta": "Join the Movement"
+        }
+      },
+      {
+        "json": {
+          "name": "Medical Trust Focus",
+          "headline": "TRUSTED BY MEDICAL PROFESSIONALS",
+          "prompt": "A close-up image of the Blaze Performance Nasal Strip (Black Edition) centrally placed with its flexible curved shape and soft adhesive texture visible. Background is deep black (#000000) with a subtle stylized flame in orange/red (#FF4500) in the corner. Overlay transparent medical seal badges near the top including icons or seals saying “Doctor Recommended” and “Performance Tested.” Text overlay at top center in bold, uppercase white font: \"TRUSTED BY MEDICAL PROFESSIONALS.\" Below that, in smaller gray text (#D3D3D3), include scientific endorsement snippets like 'Clinically Tested for Maximum Breathability.' Bottom text block shows the product name: \"BLAZE PERFORMANCE NASAL STRIPS\" with a subtle shadow effect for emphasis. Layout balanced with circular badges showcasing “60 Strips” and “Strong Adhesive.” Lighting focused on highlighting the texture and contours of the strip, with reflections to emphasize premium quality. Mood is confident and authoritative.",
+          "emotional_hook": "Feel assured with a product endorsed by medical experts to enhance your breathing and performance.",
+          "cta": "Breathe Better Now"
+        }
+      },
+      {
+        "json": {
+          "name": "Performance Athlete Hero",
+          "headline": "Breathe Freely, Perform Strongly",
+          "prompt": "Lifestyle image of a young, athletic runner mid-stride in an outdoor setting, applying a black Blaze Performance Nasal Strip on his nose. The background shows blurred movement lines to evoke speed and energy. Color palette uses deep black and grays with orange/red flame branding subtly integrated in the runner’s sportswear or nearby. Packaging pouch inset bottom right with clear visibility showing the resealable pouch and ‘60 Strips’ badge. Text overlay at top: \"Breathe Freely, Perform Strongly\" in bold white font, centered. Bottom text displays the product name in spaced Montserrat font with a slight shadow. Balanced visual hierarchy with badges on either side emphasizing “Performance Tested” and “Resealable Pouch.” Mood is dynamic, inspiring, and empowering active lifestyle users.",
+          "emotional_hook": "Unlock your full potential with every breath you take during intense training.",
+          "cta": "Boost Your Performance"
+        }
+      },
+      {
+        "json": {
+          "name": "Product Feature Spotlight",
+          "headline": "Comfort Meets Performance",
+          "prompt": "Macro shot of the Blaze Performance Nasal Strip showcasing its flexible curved shape and soft but strong adhesive texture prominently around the edges. The image places the strip centrally with a deep black background (#000000) accented by subtle hexagonal pattern overlays in gray (#4B4B4B). Callout text overlays in white and light gray highlight product benefits: \"Flexible, Comfortable Fit\" and \"Long-lasting Adhesion.\" Circular badges on the left display “60 Strips” and “Performance Tested.” The product name is at the bottom in bold, clean font with light shadow, ensuring readability. Minimal lighting focused to highlight texture and material details. The mood is sleek, premium, and modern.",
+          "emotional_hook": "Experience unparalleled comfort and durability designed for your active lifestyle.",
+          "cta": "Get Yours Today"
+        }
+      },
+      {
+        "json": {
+          "name": "Resealable Convenience",
+          "headline": "Keeps Fresh for Every Session",
+          "prompt": "Image shows the Blaze Performance Nasal Strip in its sleek, modern resealable pouch open with a few strips visible inside. Product placed centered with strong lighting focused on the pouch’s stylish design and resealable top. Background is deep black (#000000) with subtle flame orange accents from the branding element near the top right corner. Circular badges positioned on the right highlight ‘60 Strips’ and ‘Resealable Pouch’ boldly in white text on gray badges (#4B4B4B). Text overlay on top in bold white sans-serif font: \"Keeps Fresh for Every Session.\" Bottom text block states product name with letter spacing and shadow: “BLAZE PERFORMANCE NASAL STRIPS.” Mood conveys convenience, reliability, and freshness.",
+          "emotional_hook": "Stay ready for action anytime with freshness that lasts from every pack.",
+          "cta": "Get Yours Today"
+        }
+      },
+      {
+        "json": {
+          "name": "Night Use Emphasis",
+          "headline": "Breathe Easy, Sleep Better",
+          "prompt": "A peaceful nighttime lifestyle image of a relaxed young adult male lying in bed wearing the black Blaze Performance Nasal Strip. The background is dimmed grayish black (#1A1A1A) with soft focused lighting around the subject's face to evoke calm and restfulness. Text overlay on the top in soft white font: \"Breathe Easy, Sleep Better.\" Lower third displays the product name in white with soft gray shadowing for clarity. A subtle stylized orange flame logo is positioned delicately in a corner to maintain brand identity. Circular badges for “60 Strips” and “Comfort Fit” are placed top left to balance the composition. The mood is serene, trustworthy, and comforting.",
+          "emotional_hook": "Enjoy restful nights with easy breathing you can trust every evening.",
+          "cta": "Breathe Better Now"
+        }
+      },
+      {
+        "json": {
+          "name": "Flame Brand Identity Feature",
+          "headline": "Ignite Your Breath, Elevate Your Game",
+          "prompt": "An artistic composition with a dominant stylized orange/red flame wrapping softly around the central Blaze Performance Nasal Strip (Black Edition). The strip is front and center against a deep black background (#000000) with subtle hexagonal pattern in the background in dark gray (#4B4B4B). The top header uses bold white uppercase text: \"Ignite Your Breath, Elevate Your Game.\" Bottom footer displays product name in sleek white font with subtle flame orange (#FF4500) shadowing and letter spacing. CTA button in bright orange (#FF4500) positioned bottom center. Circular badges with “60 Strips” and “Performance Tested” flank the strip. Mood is energetic, bold, and impactful.",
+          "emotional_hook": "Fuel your fire with every breath and push your limits higher.",
+          "cta": "Boost Your Performance"
+        }
+      },
+      {
+        "json": {
+          "name": "Minimalist Bold Text Only",
+          "headline": "60 STRIPS | BLACK | PERFORMANCE",
+          "prompt": "Simple, minimalist design with a solid deep black background (#000000). Bold white sans-serif text blocks center aligned stating: \"60 STRIPS | BLACK | PERFORMANCE\" in large all-caps font. No product imagery, just dynamic bold typography for Instagram stories or reels. Orange flame (#FF4500) subtly incorporated as a thin horizontal line or underline beneath the text. The composition uses negative space to focus attention on the text’s power and clarity. Mood is stark, modern, and direct.",
+          "emotional_hook": "Make a statement with simplicity—premium performance in every strip.",
+          "cta": "Get Yours Today"
+        }
+      },
+      {
+        "json": {
+          "name": "Customer Testimonial Overlay",
+          "headline": "\"Game Changer for My Breathing!\"",
+          "prompt": "Photo of a smiling active user wearing Blaze Performance Nasal Strip mid-workout outdoors. Overlaid quote bubble near the top right says: \"Game Changer for My Breathing!\" in white text on translucent black background. Top text block states: \"Trusted by Athletes Worldwide\" in bold white font. Product image of strip and resealable pouch inset bottom left for product visibility. Background is predominantly deep black with subtle gray tones (#4B4B4B), with branding flame logo softly placed top left corner. Circular badges including “60 Strips” and “Doctor Recommended” placed balanced on the right. Mood is authentic, trustworthy, and empowering.",
+          "emotional_hook": "Hear from real users who have transformed their breathing experience.",
+          "cta": "Breathe Better Now"
+        }
+      },
+      {
+        "json": {
+          "name": "Before & After Visual",
+          "headline": "Feel the Difference Instantly",
+          "prompt": "Split-screen image with the left side showing a silhouette profile of a nose without the Blaze strip and airflow lines congested and narrow. The right side shows the same profile with the black nasal strip applied and airflow lines wider and glowing in subtle orange/red. Background behind both sides is deep black (#000000) with light gray (#D3D3D3) hexagonal pattern behind. Top text overlay in bold white: \"Feel the Difference Instantly.\" Bottom text block: \"BLAZE PERFORMANCE NASAL STRIPS\" in spaced bold font with subtle shadow. Circular badges for “Performance Tested” and “60 Strips” positioned bottom corners. Mood is educational, impactful, and trust-building.",
+          "emotional_hook": "See and feel the immediate breathability improvement with Blaze.",
+          "cta": "Get Yours Today"
+        }
+      },
+      {
+        "json": {
+          "name": "Limited Edition/Exclusive Boost",
+          "headline": "BLACK EDITION – Get Yours Before They’re Gone!",
+          "prompt": "Product-focused ad with the Blaze Performance Nasal Strip Black Edition packaging front and center with a gold stroke outline on the text \"BLACK EDITION\" to evoke exclusivity. Deep black background (#000000) with subtle orange flame graphic behind product. Top header in bold white uppercase text: \"BLACK EDITION.\" Below it, urgency line in italic bright orange (#FF4500): \"Get Yours Before They’re Gone!\" Bottom product name with letter spacing and drop shadow: \"BLAZE PERFORMANCE NASAL STRIPS.\" Circular gold-accented badges for \"60 Strips\" and \"Limited Supply\" positioned balanced on the side. Lighting highlights the product pouch and strip texture to convey premium quality. Mood is exclusive, urgent, and premium.",
+          "emotional_hook": "Don’t miss out on this exclusive edition crafted for peak performance.",
+          "cta": "Get Yours Today"
+        }
+      },
+      {
+        "json": {
+          "name": "Medical Endorsement Focus",
+          "headline": "TRUSTED BY MEDICAL PROFESSIONALS",
+          "prompt": "Visual features a confident medical professional wearing a white coat, with Blaze Performance Nasal Strip applied on the nose. Background is solid black with subtle hexagonal pattern overlay in darker gray behind the subject. Blaze black nasal strip and resealable pouch prominently displayed off-center. Text overlay in bold white at top: 'TRUSTED BY MEDICAL PROFESSIONALS'; below headline in smaller light gray: 'Designed for Maximum Comfort & Effectiveness'. Bottom corner features a circular badge in light gray reading '60 STRIPS'. Lighting is crisp and clinical, emphasizing product detail and professional trust. Modern sans-serif fonts used throughout.",
+          "emotional_hook": "Evokes trust and safety by associating product with medical expertise and professional endorsement, reassuring users of its reliability and quality.",
+          "cta": "Experience trusted performance—get your Blaze strips today!"
+        }
+      },
+      {
+        "json": {
+          "name": "Athlete Performance Focus",
+          "headline": "BOOST YOUR BREATHING, MAXIMIZE PERFORMANCE",
+          "prompt": "Close-up of an athlete mid-training applying or wearing the Blaze nasal strip, showing the flexible curved shape fitting snugly on the nose. Black background with a subtle hexagonal overlay in dark gray textures behind. The Blaze product packaging is visible at bottom right corner with high contrast to draw attention. Text overlays include top headline in bold white caps and subtext below reading 'Engineered for Peak Airflow & Comfort' in light gray. Bottom left corner features the circular badge 'LONG-LASTING ADHESIVE' in gray. Light is energetic and dynamic, highlighting perseverance and peak performance.",
+          "emotional_hook": "Connects with the viewer's ambition and drive by highlighting improved breathing leading to athletic excellence and confidence.",
+          "cta": "Unlock your peak performance—shop Blaze now!"
+        }
+      },
+      {
+        "json": {
+          "name": "Product Detail Highlight",
+          "headline": "ERGONOMICALLY DESIGNED FOR LASTING COMFORT",
+          "prompt": "Macro shot of the black Blaze nasal strip curved elegantly to showcase its flexible adhesive texture, set centrally. The background is a deep black with faint hexagonal patterns softly glowing behind to emphasize innovation and modernity. Text overlays top center in bold white: 'ERGONOMICALLY DESIGNED FOR LASTING COMFORT', with secondary supporting line below in light gray: 'Flexible Fit, Maximum Breathability'. Bottom right corner circular badge reading '60 STRIPS'. Clean, minimal lighting highlights texture and detail of the strip material.",
+          "emotional_hook": "Invites users to appreciate the sophisticated design and comfort, appealing to their desire for effective, high-quality solutions.",
+          "cta": "Feel the comfort—order Blaze nasal strips today!"
+        }
+      },
+      {
+        "json": {
+          "name": "Packaging Showcase",
+          "headline": "60 STRIPS PER PACK — BUILT FOR LONG-TERM USE",
+          "prompt": "Sharp, well-lit image of the Blaze black resealable pouch standing upright against a solid black background with hexagonal pattern overlay behind the package edges. Text overlay at top center in bold white caps: '60 STRIPS PER PACK — BUILT FOR LONG-TERM USE'. Bottom left features the Blaze flame logo in muted red/orange as a subtle accent. Circular badge on right side with 'LONG-LASTING ADHESIVE' calls attention. Lighting highlights package material texture and product lettering clearly for easy readability.",
+          "emotional_hook": "Conveys value and reliability by emphasizing large quantity and durable adhesive, appealing to practical and cost-conscious consumers.",
+          "cta": "Stock up on performance—buy your pack of Blaze strips now!"
+        }
+      },
+      {
+        "json": {
+          "name": "Nighttime Use Focus",
+          "headline": "SLEEP BETTER. BREATHE EASIER.",
+          "prompt": "Relaxed individual sleeping peacefully with a Blaze nasal strip applied, centered in frame against a smooth black background with a darker gray hexagonal pattern softly overlaying behind. Text overlay at top in bold white: 'SLEEP BETTER. BREATHE EASIER.' Supporting subtext beneath in light gray: 'Comfortable fit for restful nights'. Bottom right corner circular badge reading '60 STRIPS'. Soft, warm lighting conveys calm and comfort.",
+          "emotional_hook": "Elicits feelings of restful sleep and tranquility, emphasizing the product’s benefit for improving nightly breathing and overall wellness.",
+          "cta": "Improve your sleep—try Blaze nasal strips tonight!"
+        }
+      },
+      {
+        "json": {
+          "name": "Modern & Sleek Design Focus",
+          "headline": "PERFORMANCE NASAL STRIPS WITH A MODERN EDGE",
+          "prompt": "Minimalist flat-lay of Blaze nasal strips and packaging set against a pure black background with a bold hexagonal pattern overlay in subtle dark gray. Product placed centrally with the pack opened slightly to reveal strips inside. Text overlay top center in bold white caps: 'PERFORMANCE NASAL STRIPS WITH A MODERN EDGE'. Bottom left circular badge reading 'LONG-LASTING ADHESIVE'. Clean, stylish lighting emphasizing sleekness and modernity.",
+          "emotional_hook": "Appeals to trend-conscious consumers by showcasing the sleek, contemporary design and innovative features of Blaze strips.",
+          "cta": "Elevate your routine—get Blaze nasal strips today!"
+        }
+      },
+      {
+        "json": {
+          "name": "User Testimonial Focus",
+          "headline": "'BLAZE CHANGED MY WORKOUTS' — ATHLETE APPROVED",
+          "prompt": "Portrait of a real user/athlete smiling confidently with Blaze nasal strip applied. Background is solid black with textured hexagonal pattern in darker gray behind subject. Text overlay top in bold white: 'BLAZE CHANGED MY WORKOUTS' — ATHLETE APPROVED. Beneath, smaller light gray text reading 'Trusted by active individuals for unbeatable airflow'. Product packaging subtly visible bottom right. Circular badge with '60 STRIPS' in bottom left. Lighting bright and authentic to evoke genuine connection.",
+          "emotional_hook": "Builds trust through authentic social proof and personal success, inspiring potential buyers to envision similar benefits.",
+          "cta": "Join the athletes—try Blaze nasal strips now!"
+        }
+      },
+      {
+        "json": {
+          "name": "Value Pack Focus",
+          "headline": "STOCK UP & SAVE — 60 HIGH-PERFORMANCE STRIPS",
+          "prompt": "Image emphasizes the large quantity pack: a Blaze resealable pouch prominently displayed center with scattered nasal strips artistically arranged around. Black background with hexagonal dark gray textured overlay to add depth. Text overlay top center in bold white caps: 'STOCK UP & SAVE — 60 HIGH-PERFORMANCE STRIPS'. Bottom right corner circular badge reading 'LONG-LASTING ADHESIVE'. Lighting highlights product details and gives a premium feel.",
+          "emotional_hook": "Speaks to practicality and cost-effectiveness, motivating bulk purchase for consistent performance and savings.",
+          "cta": "Get more for less—order your Blaze value pack today!"
+        }
+      },
+      {
+        "json": {
+          "name": "Comfort & Flexibility Focus",
+          "headline": "FLEXIBLE FIT FOR EVERY NOSE SHAPE",
+          "prompt": "Close-up image of Blaze nasal strip bending gently around a curved surface to demonstrate flexibility and soft adhesive. Black background with subtle hexagonal pattern overlay in darker gray. Text overlay top center in bold white caps: 'FLEXIBLE FIT FOR EVERY NOSE SHAPE'. Supporting line below in light gray: 'Soft, secure, and comfortable all day'. Bottom left circular badge '60 STRIPS'. Dramatic yet clear lighting highlights texture and bendability of the strip material.",
+          "emotional_hook": "Reassures consumers of universal fit and comfort, reducing hesitation about product suitability for individual needs.",
+          "cta": "Discover the perfect fit—try Blaze now!"
+        }
+      },
+      {
+        "json": {
+          "name": "Trust Badge Emphasis",
+          "headline": "YOUR TRUSTED NASAL STRIP CHOICE",
+          "prompt": "Large circular, hexagonal edged badge in light gray reading 'Trusted Quality' placed prominently on left side with Blaze nasal strip and packaging on right against a deep black background. Text overlay at top in bold white caps: 'YOUR TRUSTED NASAL STRIP CHOICE'. Bottom right corner circular badge with '60 STRIPS'. Minimal, modern sans-serif fonts. Lighting designed to draw focus on badge and product equally, highlighting reliability and premium design.",
+          "emotional_hook": "Strengthens confidence in product quality and trustworthiness by visually emphasizing certification and reliability.",
+          "cta": "Choose trust—buy Blaze nasal strips today!"
+        }
+      }
+    ],
+    "Get Ad Inspirations": [
+      {
+        "json": {
+          "id": "1e_dtGdhNjORGsktW38hp7IXnP3U6D-p0",
+          "name": "MT_09_2_89d47567-d7a3-45d7-bf43-5fcdac86cb05.webp"
+        }
+      },
+      {
+        "json": {
+          "id": "11pR7XgMG6Sc5yqH3smSXyzd4PZ68f6zI",
+          "name": "HTNFACESTAR.webp"
+        }
+      },
+      {
+        "json": {
+          "id": "1FpgJ9vHTwuolcapJ2VeqPgu9EABf3AJl",
+          "name": "NS_05_c97ffc7d-b988-4b5e-b35a-7087fe29bb6e.webp"
+        }
+      }
+    ],
+    "Get Product Images": [
+      {
+        "json": {
+          "id": "1uirnhR6CpsZcK0j2-LaInqyc6INE0472",
+          "name": "81kJnJOJrmL._AC_UF1000,1000_QL80_.jpg"
+        }
+      }
+    ],
+    "Download Inspiration": [
+      {
+        "json": {
+          "id": "1e_dtGdhNjORGsktW38hp7IXnP3U6D-p0",
+          "name": "MT_09_2_89d47567-d7a3-45d7-bf43-5fcdac86cb05.webp"
+        }
+      },
+      {
+        "json": {
+          "id": "11pR7XgMG6Sc5yqH3smSXyzd4PZ68f6zI",
+          "name": "HTNFACESTAR.webp"
+        }
+      },
+      {
+        "json": {
+          "id": "1FpgJ9vHTwuolcapJ2VeqPgu9EABf3AJl",
+          "name": "NS_05_c97ffc7d-b988-4b5e-b35a-7087fe29bb6e.webp"
+        }
+      }
+    ],
+    "Download Product": [
+      {
+        "json": {
+          "id": "1uirnhR6CpsZcK0j2-LaInqyc6INE0472",
+          "name": "81kJnJOJrmL._AC_UF1000,1000_QL80_.jpg"
+        }
+      }
+    ],
+    "Analyze Product": [
+      {
+        "json": {
+          "content": "- **Main Product:** Performance nasal strips (Blaze brand)  \n- **Core Emotions:** Confidence, strength, energy  \n- **Visual Style Cues:** Sleek and modern design, use of black and silver tones suggesting a high-performance, minimalist aesthetic; professional and sporty feel."
+        }
+      }
+    ],
+    "AI Ad Form Submission": [
+      {
+        "json": {
+          "Campaign Type": "Product Launch",
+          "Target Platform": "Facebook",
+          "Number Of Variation": 5,
+          "Target Audience": "Doctors",
+          "Key Message/Offer": "Breathe Well Live Well",
+          "Emotional Tone": [
+            "Trust"
+          ],
+          "submittedAt": "2025-06-06T09:57:47.234-07:00",
+          "formMode": "test"
+        }
+      }
+    ],
+    "Merge": [
+      {
+        "json": {
+          "content": "### Analysis of the Static Facebook Ad Creative\n\n#### Visual Hierarchy\n- **Primary Focus**: The phrase “TRUSTED BY MEDICAL PROFESSIONALS” is prominently positioned at the top, using a large, bold font that draws immediate attention.\n- **Secondary Elements**: The subheading “For Non-Surgical Sleep Interventions” is slightly smaller and less bold but is still easily readable.\n- **Call to Action (CTA)**: The brand name “HOSTAGE NOSSTRIP” is bold and placed towards the bottom, acting as the brand identity.\n\n#### Color Psychology\n- **Color Palette**: The ad employs a stark contrast between a dark background and white text, enhancing visibility and readability.\n- **Black Background**: Evokes feelings of sophistication and urgency.\n- **White Text**: Conveys clarity and trustworthiness, allowing the audience to easily digest the message.\n\n#### Typography Analysis\n- **Font Choices**: A bold, sans-serif font is used for the headline, which emphasizes strength and reliability; the subheading uses a simpler font that maintains readability.\n- **Hierarchy and Size**: The largest text is at the top (headline), followed by medium-sized text (subheading), and the brand name at the bottom; this establishes a clear flow of information.\n\n#### Composition Elements\n- **Layout**: Central alignment is utilized with key elements vertically stacked, creating a clean and straightforward structure.\n- **Spacing**: Ample padding around the text ensures no clutter, allowing the audience to focus on each component in turn.\n- **Visual Balance**: The image of the man is positioned off-center, drawing the eye naturally towards the textual elements.\n\n#### Persuasion Techniques\n- **Authority Appeal**: “Trusted by Medical Professionals” leverages authority and credibility, increasing trust in the product.\n- **Approval Seal**: Featuring an approval badge adds an element of social proof, which can persuade hesitant consumers.\n\n#### Emotional Triggers\n- **Trust and Confidence**: The combination of authority figures and clear benefits generates feelings of security and trust in the potential customer, addressing concerns related to sleep.\n\n#### Conversion Elements\n- **Clear Messaging**: The benefits are articulated succinctly, guiding the viewer towards understanding the product’s purpose.\n- **Brand Visibility**: The logo is distinct and positioned to bolster brand recognition while encouraging a favorable association with quality.\n\n#### Technical Specifications\n- **Resolution & Size**: The ad appears to maintain high-quality resolution suitable for Facebook"
+        }
+      },
+      {
+        "json": {
+          "content": "- **Main Product:** Performance nasal strips (Blaze brand)  \n- **Core Emotions:** Confidence, strength, energy  \n- **Visual Style Cues:** Sleek and modern design, use of black and silver tones suggesting a high-performance, minimalist aesthetic; professional and sporty feel."
+        }
+      }
+    ],
+    "Analyze Inspiration": [
+      {
+        "json": {
+          "content": "### Analysis of the Static Facebook Ad Creative\n\n#### Visual Hierarchy\n- **Primary Focus**: The phrase “TRUSTED BY MEDICAL PROFESSIONALS” is prominently positioned at the top, using a large, bold font that draws immediate attention.\n- **Secondary Elements**: The subheading “For Non-Surgical Sleep Interventions” is slightly smaller and less bold but is still easily readable.\n- **Call to Action (CTA)**: The brand name “HOSTAGE NOSSTRIP” is bold and placed towards the bottom, acting as the brand identity.\n\n#### Color Psychology\n- **Color Palette**: The ad employs a stark contrast between a dark background and white text, enhancing visibility and readability.\n- **Black Background**: Evokes feelings of sophistication and urgency.\n- **White Text**: Conveys clarity and trustworthiness, allowing the audience to easily digest the message.\n\n#### Typography Analysis\n- **Font Choices**: A bold, sans-serif font is used for the headline, which emphasizes strength and reliability; the subheading uses a simpler font that maintains readability.\n- **Hierarchy and Size**: The largest text is at the top (headline), followed by medium-sized text (subheading), and the brand name at the bottom; this establishes a clear flow of information.\n\n#### Composition Elements\n- **Layout**: Central alignment is utilized with key elements vertically stacked, creating a clean and straightforward structure.\n- **Spacing**: Ample padding around the text ensures no clutter, allowing the audience to focus on each component in turn.\n- **Visual Balance**: The image of the man is positioned off-center, drawing the eye naturally towards the textual elements.\n\n#### Persuasion Techniques\n- **Authority Appeal**: “Trusted by Medical Professionals” leverages authority and credibility, increasing trust in the product.\n- **Approval Seal**: Featuring an approval badge adds an element of social proof, which can persuade hesitant consumers.\n\n#### Emotional Triggers\n- **Trust and Confidence**: The combination of authority figures and clear benefits generates feelings of security and trust in the potential customer, addressing concerns related to sleep.\n\n#### Conversion Elements\n- **Clear Messaging**: The benefits are articulated succinctly, guiding the viewer towards understanding the product’s purpose.\n- **Brand Visibility**: The logo is distinct and positioned to bolster brand recognition while encouraging a favorable association with quality.\n\n#### Technical Specifications\n- **Resolution & Size**: The ad appears to maintain high-quality resolution suitable for Facebook"
+        }
+      }
+    ],
+    "Creative Brief": [
+      {
+        "json": {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "```json\n[\n  {\n    \"visual\": \"Centered visual with a close-up of Blaze Performance Nasal Strip applied on the nose of a confident male doctor wearing a white coat. Background is deep matte black with subtle silver gradients framing the edges. Soft spotlight highlights the strip’s sleek design, emphasizing texture and clean lines. Text aligned center above the image with bold white sans-serif font.\",\n    \"headline\": \"TRUSTED BY DOCTORS, POWERED FOR PERFORMANCE\",\n    \"copy\": \"Breathe Well Live Well — Non-invasive relief for your toughest days.\",\n    \"cta\": \"Experience Confidence Now\",\n    \"tone\": \"Authoritative\"\n  },\n  {\n    \"visual\": \"Off-center, close-up of a male doctor’s profile, eyes closed in peaceful breath, highlighted by a thin silver rim light. The Blaze nasal strip is clearly visible across his nose. Background is a smooth gradient from black fading to dark gray. Text stacked vertically on the left side with crisp white typography and generous line spacing for clarity.\",\n    \"headline\": \"BREATHE WELL. LIVE WELL.\",\n    \"copy\": \"Enhance your energy, every single day with Blaze.\",\n    \"cta\": \"Get Your Strip Today\",\n    \"tone\": \"Calm & Confident\"\n  },\n  {\n    \"visual\": \"Minimalist flat lay of Blaze nasal strips beside a sleek stethoscope over a matte black surface with subtle silver reflections. The product packaging is sharp, modern, and placed top right. Text occupies the left half in bold white uppercase with strong spacing. Shadowing around objects creates depth without clutter.\",\n    \"headline\": \"STRENGTH IN EVERY BREATH\",\n    \"copy\": \"Performance you can trust, designed for medical professionals.\",\n    \"cta\": \"Shop the Collection\",\n    \"tone\": \"Professional\"\n  },\n  {\n    \"visual\": \"Dynamic portrait of a female doctor exhaling deeply with eyes open, a subtle glow illuminating her face and the Blaze strip on her nose. Dark smoky black background with silver light flares giving a sleek, energetic vibe. Text positioned at the top center with bold font and a silver underline emphasizing the headline.\",\n    \"headline\": \"BREATHE STRONGER, FEEL STRONGER\",\n    \"copy\": \"Live fully with trusted nasal support made for you.\",\n    \"cta\": \"Try Blaze Now\",\n    \"tone\": \"Empowering\"\n  },\n  {\n    \"visual\": \"Split-screen composition: left side shows a high-contrast black and white close-up of Blaze nasal strip packaging, right side shows a doctor confidently walking into a hospital corridor, overlaid with subtle silver tones. Text in white bold font stacked vertically in the center with ample padding and a glowing call-to-action button below.\",\n    \"headline\": \"YOUR PARTNER IN EVERY BREATH\",\n    \"copy\": \"Trusted by experts, built for endurance.\",\n    \"cta\": \"Order Your Pack\",\n    \"tone\": \"Trustworthy\"\n  }\n]\n```",
+            "refusal": null,
+            "annotations": []
+          },
+          "logprobs": null,
+          "finish_reason": "stop"
+        }
+      }
+    ],
+    "Generate Ad Variations": [
+      {
+        "json": {
+          "output": [
+            {
+              "image_name": "BlazeDoctor-ConfidentBreathe",
+              "headline": "\"TRUSTED BY DOCTORS, POWERED FOR PERFORMANCE\"",
+              "image_prompt": "Centered close-up of a confident male doctor wearing a white coat, sporting a Blaze Performance Nasal Strip on his nose. The background is deep matte black with subtle silver gradients softly framing the edges. A gentle spotlight highlights the sleek texture and clean lines of the nasal strip. Bold white sans-serif text is centered above the image. The mood is authoritative and professional, emphasizing trust and sophistication.",
+              "emotion": "Empowerment through trusted medical endorsement and reliable performance",
+              "call_to_action": "Experience Confidence Now",
+              "formatting_notes": "1:1 ratio; Facebook & Instagram safe zones respected"
+            },
+            {
+              "image_name": "BlazeDoctor-PeacefulProfile",
+              "headline": "\"BREATHE WELL. LIVE WELL.\"",
+              "image_prompt": "Off-center close-up of a male doctor in profile with eyes closed, taking a peaceful breath. A thin silver rim light highlights the Blaze nasal strip clearly visible on his nose. The background is a smooth gradient transitioning from black to dark gray. Crisp white typography is stacked vertically on the left side with generous line spacing. The tone is calm and confident, evoking tranquility and assuredness.",
+              "emotion": "Calm confidence and rejuvenation through ease of breathing",
+              "call_to_action": "Get Your Strip Today",
+              "formatting_notes": "1:1 ratio; Facebook & Instagram safe zones respected"
+            },
+            {
+              "image_name": "BlazeMinimalistFlatlay-Stethoscope",
+              "headline": "\"STRENGTH IN EVERY BREATH\"",
+              "image_prompt": "Minimalist flat lay showing Blaze nasal strips beside a sleek stethoscope on a matte black surface with subtle silver reflections. The product packaging is sharp and modern, placed at the top right. Bold white uppercase text occupies the left half of the composition with strong spacing. Shadows create depth without clutter. The style is professional and clean, highlighting product trustworthiness for medical professionals.",
+              "emotion": "Dependable strength and professionalism in every breath",
+              "call_to_action": "Shop the Collection",
+              "formatting_notes": "1:1 ratio; Facebook & Instagram safe zones respected"
+            },
+            {
+              "image_name": "BlazeFemaleDoctor-StrongExhale",
+              "headline": "\"BREATHE STRONGER, FEEL STRONGER\"",
+              "image_prompt": "Dynamic portrait of a female doctor exhaling deeply with eyes open, a subtle glow illuminating her face and the Blaze strip on her nose. The background is dark smoky black with silver light flares for a sleek, energetic vibe. Text is positioned top center with bold font and a silver underline emphasizing the headline. The visual tone is empowering and energetic, highlighting vitality and trust.",
+              "emotion": "Empowerment and increased vitality from reliable nasal support",
+              "call_to_action": "Try Blaze Now",
+              "formatting_notes": "1:1 ratio; Facebook & Instagram safe zones respected"
+            },
+            {
+              "image_name": "BlazeSplitScreen-TrustedPartner",
+              "headline": "\"YOUR PARTNER IN EVERY BREATH\"",
+              "image_prompt": "Split-screen composition with the left side displaying a high-contrast black and white close-up of Blaze nasal strip packaging, and the right side showing a doctor confidently walking into a hospital corridor. The scene includes subtle silver tones. White bold font text is stacked vertically in the center with ample padding, and a glowing call-to-action button is positioned below. The mood conveys trustworthiness and endurance.",
+              "emotion": "Confidence and trust built through expert endorsement and sustained performance",
+              "call_to_action": "Order Your Pack",
+              "formatting_notes": "1:1 ratio; Facebook & Instagram safe zones respected"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Get Ad Inspirations": {
+      "main": [
+        [
+          {
+            "node": "Download Inspiration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Inspiration": {
+      "main": [
+        [
+          {
+            "node": "Analyze Inspiration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Product": {
+      "main": [
+        [
+          {
+            "node": "Analyze Product",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Product Images": {
+      "main": [
+        [
+          {
+            "node": "Download Product",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Product": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Split": {
+      "main": [
+        [
+          {
+            "node": "Platform Adapter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Platform Adapter": {
+      "main": [
+        [
+          {
+            "node": "Batch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Batch": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Open AI Generate Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to AI Ads Folder": {
+      "main": [
+        [
+          {
+            "node": "Batch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Ad Form Submission": {
+      "main": [
+        [
+          {
+            "node": "Get Product Images",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Ad Inspirations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Creative Brief",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Open AI Generate Image": {
+      "main": [
+        [
+          {
+            "node": "B64 String to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "B64 String to File": {
+      "main": [
+        [
+          {
+            "node": "Save to AI Ads Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Inspiration": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Creative Brief": {
+      "main": [
+        [
+          {
+            "node": "Generate Ad Variations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GPT-4 Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate Ad Variations",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Generate Ad Variations",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Ad Variations": {
+      "main": [
+        [
+          {
+            "node": "Split",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Variations": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Image": {
+      "main": [
+        [
+          {
+            "node": "Convert To File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Quality Check": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Quality Pass?": {
+      "main": [
+        [
+          {
+            "node": "Save to Drive",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Enhance Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to Drive": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enhance Prompt": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Generate Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert To File": {
+      "main": [
+        [
+          {
+            "node": "Quality Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Quality Pass?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6a1505a0-2921-4f9e-8289-1693552d24c7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8a5519c781c38cf0bb022b7a95b8936c7e3443148855ceab401845a0684796d2"
+  },
+  "id": "BZxfUHlrk4qyQCX6",
+  "tags": []
+}

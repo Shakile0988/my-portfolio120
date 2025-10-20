@@ -1,0 +1,2290 @@
+{
+  "name": "Recent News Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "toolDescription": "Get the news related to the topic requested by the user",
+        "url": "https://www.googleapis.com/customsearch/v1",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "parametersQuery": {
+          "values": [
+            {
+              "name": "cx",
+              "valueProvider": "fieldValue",
+              "value": "c17f18c6c423648d1"
+            },
+            {
+              "name": "q"
+            },
+            {
+              "name": "tbm",
+              "valueProvider": "fieldValue",
+              "value": "nws"
+            },
+            {
+              "name": "dateRestrict",
+              "valueProvider": "fieldValue",
+              "value": "d1"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        880,
+        -160
+      ],
+      "id": "5beeefb3-4168-4763-b134-ebfdbb78dc81",
+      "name": "googleSearch",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "KsZtfTblC1wEpEsN",
+          "name": "Brave Search Header Auth"
+        },
+        "googleOAuth2Api": {
+          "id": "UtmKUsfXJQBnZd8P",
+          "name": "Google Places API"
+        },
+        "httpQueryAuth": {
+          "id": "o0czQvFOsUA1JddF",
+          "name": "Google Query Auth API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        660,
+        -140
+      ],
+      "id": "6612cd4f-b30f-4e4a-8fd9-bf7bf38fe07e",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "AG2i36rIlQJn1Cj3",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ccf4033b-82ed-425a-af19-cd700e215a60",
+              "name": "session_id",
+              "value": "={{$('Merge').first().json.user }}:{{ $json.message.thread_ts }}",
+              "type": "string"
+            },
+            {
+              "id": "7d173f2a-3170-411f-b6df-da811ad2c438",
+              "name": "text",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            },
+            {
+              "id": "077a3c24-aa83-467c-827d-95fce00385b7",
+              "name": "user",
+              "value": "={{$('Merge').first().json.user }}",
+              "type": "string"
+            },
+            {
+              "id": "e74a0898-cff1-461c-a35e-8276987c5205",
+              "name": "previousConversationChain",
+              "value": "news",
+              "type": "string"
+            },
+            {
+              "id": "0943a235-53fb-4e3b-ba11-2c3ff8e41799",
+              "name": "timeAdded",
+              "value": "={{ $now }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1200,
+        -300
+      ],
+      "id": "f2be3265-7fb8-40a0-bbb3-724829db5fb5",
+      "name": "Update Postgres With New Message10"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "n8n_rodger_chat",
+          "mode": "list",
+          "cachedResultName": "n8n_rodger_chat"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "session_id": "={{ $json.session_id }}",
+            "message": "={\n  \"type\": \"Bot\",\n  \"data\": {\n    \"content\": \"{{ $('Update Postgres With New Message10').first().json.text.replace(/\\\\/g, '\\\\\\\\').replace(/\"/g, '\\\\\\\"').replace(/{/g, '\\\\{').replace(/}/g, '\\\\}').replace(/\\n/g, '\\\\n').replace(/\\r/g, '') }}\",\n    \"respondingTo\": \"{{ $('Merge').first().json.user }}\",\n    \"timeAdded\": \"{{ $('Update Postgres With New Message10').item.json.timeAdded }}\",\n    \"previousConversationChain\": \"news\"\n  }\n}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "session_id",
+              "displayName": "session_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1600,
+        -300
+      ],
+      "id": "3234aaa5-dcea-420b-816f-e382c067a46a",
+      "name": "Update Thread Memory Session25",
+      "credentials": {
+        "postgres": {
+          "id": "PsARREIXEOG7p5ku",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "n8n_rodger_chat",
+          "mode": "list",
+          "cachedResultName": "n8n_rodger_chat"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "session_id": "={{ $('Update Postgres With New Message10').item.json.session_id }}",
+            "message": "={\n  \"type\": \"human\",\n  \"data\": {\n    \"content\": \"{{ $('Merge').first().json.text.replace(/\\\\/g, '\\\\\\\\').replace(/\"/g, '\\\\\\\"').replace(/{/g, '\\\\{').replace(/}/g, '\\\\}').replace(/\\n/g, '\\\\n').replace(/\\r/g, '') }}\",\n    \"TimeAdded\": \"{{ $now }}\"\n  }\n}\n"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "session_id",
+              "displayName": "session_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1420,
+        -300
+      ],
+      "id": "b6529693-097d-4a1f-8837-c2d99c0d7e32",
+      "name": "Update Thread Memory Session26",
+      "credentials": {
+        "postgres": {
+          "id": "PsARREIXEOG7p5ku",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C08CE2WBQR3",
+          "mode": "list",
+          "cachedResultName": "patty_pa_input"
+        },
+        "text": "={{ $json.output }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false,
+          "link_names": true,
+          "thread_ts": {
+            "replyValues": {
+              "thread_ts": "={{ $('Merge').item.json.ts }}"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        1000,
+        -300
+      ],
+      "id": "3bab6621-6994-4753-9679-430cc80521dc",
+      "name": "Message: User",
+      "webhookId": "3b0a7196-cb0c-448d-b026-37f1755ce50d",
+      "credentials": {
+        "slackApi": {
+          "id": "ncQHsmHkvcVCSFNi",
+          "name": "Patty_PA_Bot API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=**Current User Request:** {{ $json.text }}\n\n**Previous Conversations:** {{ $json.message.data.content }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=<system message>\nYOU ARE A NEWS INTENT CLASSIFIER AND TIMEFRAME EXTRACTOR TASKED WITH INTERPRETING USER REQUESTS TO DETERMINE IF THEY ARE SEEKING NEWS CONTENT. YOUR GOAL IS TO IDENTIFY BOTH THE SUBJECT OF INTEREST AND THE TIME WINDOW SPECIFIED IN THE USER’S CONVERSATION.\n\nUSE ALL AVAILABLE INFORMATION to detect the news-related intent and extract relevant components, including:\n- The USER'S CURRENT INPUT\n- ANY PRIOR THREAD OR CONVERSATION CONTEXT\n- The value of `previousConversationChain` (if provided)\n\n---\n\n## 🔹 INPUTS\n\n- **Previous Conversations**: Thread history or past messages\n- **User’s Current Input**: Real-time message content\n\n---\n\n## 🔹 PRIMARY TASKS\n\nYou MUST:\n- DETERMINE whether the user is requesting news, and if so:\n  - EXTRACT the topic or subject of the news request (e.g., \"Apple earnings\", \"Middle East\", \"Olympics\", etc.)\n  - CLASSIFY the timeframe being requested into ONE of the following:\n    - `\"today\"` → for language indicating same-day urgency (e.g., “today”, “right now”, “this morning”)\n    - `\"recent\"` → for language suggesting general current news, no strict date (e.g., “latest”, “what’s going on”, “news on”, “anything new”)\n    - `\"week\"` → for language referencing the past several days or week (e.g., “last 7 days”, “this week”, “past few days”)\n- IF NEITHER A SUBJECT NOR A TIMEFRAME CAN BE DETERMINED, RETURN EMPTY STRINGS FOR THOSE FIELDS\n\n---\n\n## 🔹 OUTPUT FORMAT\n\nReturn a single JSON object with the following fields:\n{\n  \"search_subject\": \"<string_or_empty>\",\n  \"timeframe\": \"<today OR recent OR week OR empty_string>\"\n}\n\n---\n\n## 🔹 DECISIONAL CHAIN OF THOUGHT\n\n1. **UNDERSTAND**: Read the user's input carefully. Is this a news request or not?\n2. **BASICS**: Identify any subject the user wants news about (a company, event, location, topic, etc.).\n3. **BREAK DOWN**: Examine temporal language to detect timeframe (today / recent / week).\n4. **ANALYZE**: Check for compound statements or unrelated information; extract only news-related info.\n5. **BUILD**: Map the extracted intent into the structured JSON format.\n6. **EDGE CASES**: Handle vague or indirect references, conversational phrasing, or partial requests.\n7. **FINAL ANSWER**: Return a complete structured JSON object with precise fields.\n\n---\n\n## 🔹 EXAMPLES\n\n**Example 1:**  \nUser: _\"What’s the latest news on the TikTok ban?\"_\n\n{\n  \"search_subject\": \"TikTok ban\",\n  \"timeframe\": \"\"\n}\n\nIn the above example, \"the latest\" isn't specific enough to determine if it is meant to find news from today, the past few days, or this past week. So the timeframe field is left empty\n\n**Example 2:**  \nUser: _\"Show me news about the Middle East this week.\"_\n\n{\n  \"search_subject\": \"Middle East\",\n  \"timeframe\": \"week\"\n}\n\n**Example 3:**  \nUser: _\"Anything tech news today?\"_\n\n{\n  \"search_subject\": \"tech\",\n  \"timeframe\": \"today\"\n}\n\n**Example 4:**  \nUser: _\"What's the news for today?\"_\n\n{\n  \"search_subject\": \"\",\n  \"timeframe\": \"today\"\n}\n\nIn the above example, while the user is searching for news for today, the type of news is not determined UNLESS it can be found in the previous conversation history. So the search_subject field is left empty unless it is otherwise specified previously.\n\n---\n\n## ❌ WHAT NOT TO DO\n\n- ❌ DO NOT fabricate a news subject if the user hasn’t clearly indicated one\n- ❌ DO NOT ignore casual mentions when attached to requests for news (e.g., \"I saw something about Tesla, what's the latest news on it\") as these can be the subject of the search.\n- ❌ NEVER assume a timeframe (as in: Don't default to “recent”) unless there is a lexical or contextual basis in the current user message or previous conversation history. Unless it is clear in the text or the prior conversation history what the user is looking for, leave the timeframe field empty.\n- ❌ DO NOT return additional explanation or commentary — ONLY return the structured JSON\n\n---\n\n📦 OUTPUT FORMAT (again)\nReturn ONLY a single JSON object with:\n- `search_subject`: topic string or \"\"\n- `timeframe`: \"today\", \"recent\", \"week\", or \"\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -200,
+        -200
+      ],
+      "id": "b00bb9b4-15ae-4e7f-b9f2-d4fd6d6347d1",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"search_subject\": \"TikTok ban\",\n  \"timeframe\": \"today\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        -40
+      ],
+      "id": "e3226b33-f0e0-4dee-a66a-b3e2873246fc",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -200,
+        0
+      ],
+      "id": "9a00b82e-b525-409f-a367-c6d3b0324b63",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "AG2i36rIlQJn1Cj3",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output.timeframe }}",
+                    "rightValue": "today",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "c1d3e85d-1be2-4870-854e-c34c21cc1a9c"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Today's News"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0c3961c5-1622-4d82-9f82-0ff4cabd80dd",
+                    "leftValue": "={{ $json.output.timeframe }}",
+                    "rightValue": "recent",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Recent News"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "55dce012-6e40-4117-aa71-ce730ad38e3a",
+                    "leftValue": "={{ $json.output.timeframe }}",
+                    "rightValue": "week",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "This Week"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        420,
+        0
+      ],
+      "id": "b63b3b6a-0a30-458e-8c70-9badb83fb848",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=**Current User Request:** {{ $('Merge').item.json.text }}\n\n**Previous Conversations:** {{ $('Merge').item.json.message.data.content }}",
+        "options": {
+          "systemMessage": "=<system_prompt>\nYOU ARE A PROFESSIONAL NEWS ANALYST AND DIGITAL ASSISTANT — ARTICULATE, THOROUGH, AND TASKED WITH DELIVERING CURRENT, CITED, AND WELL-SYNTHESIZED NEWS REPORTING ON DEMAND.\n\nYOUR ROLE: CONDUCT REAL-TIME NEWS RESEARCH ON BEHALF OF THE USER.  \nYOU DO NOT GUESS. YOU LOCATE VERIFIED REPORTING AND DELIVER A CLEAR, CREDIBLE SUMMARY WITH SOURCES.\n\n---\n\n## 🗞️ NEWS RESEARCH FLOW\n\n1. ✅ **UNDERSTAND THE REQUEST**  \n   - IDENTIFY the user’s intent and **specific news topic of interest**\n\n2. ✅ **FORMULATE A NEWS-CENTRIC SEARCH QUERY**  \n   - WRITE A **FULL, NATURAL-LANGUAGE SEARCH PHRASE** suitable for professional-level news retrieval  \n   - EMPHASIZE:\n     - Specific topical keywords  \n     - Skip time qualifiers — the search tool handles those  \n     - Clarifiers that indicate **journalistic relevance** (e.g., “news on”, “coverage of”, “reporting about”)\n\n   - EXAMPLES OF EFFECTIVE NEWS QUERIES:\n     - ✅ “What is the latest news on the Tesla recall as of May 30, 2025?”\n     - ✅ “Coverage of the flooding in southern Brazil this week”\n     - ✅ “Top headlines about the AI regulation bill passed in Congress today”\n     - ✅ “What are news outlets reporting about the Boeing safety crisis this week?”\n     - ✅ “Recent developments in the Supreme Court ruling on Section 230”\n\n   - AVOID:\n     - ❌ Keyword clumps like “Boeing crash news 2025”\n     - ❌ Vague prompts like “Tell me about Tesla”\n     - ❌ Social media references like “reddit”, “instagram”, “youtube” unless directly relevant\n\n3. ✅ **TEMPORAL AWARENESS**  \n   - TODAY’S DATE IS: {{ $today.format('DDDD') }}  \n   - PRIORITIZE TIMELY INFORMATION and consider chronology when evaluating developments\n\n4. ✅ **CALL THE TOOL**\n```json\n{ \"q\": \"fully written, natural-language news search query goes here\" }\n```\n\n5. ✅ **ANALYZE THE RESULTS**\n\nREVIEW ARTICLES FROM **CREDIBLE JOURNALISTIC SOURCES** (major publications, verified outlets)\n\nEXTRACT:\n- Headlines and major developments  \n- Quotes, data, and timelines  \n- Names of involved parties or institutions  \n- Source names and publication dates  \n\n✅ CITE **MULTIPLE RELIABLE SOURCES** TO PROVIDE CONTEXT  \n✅ WHEN CITING SOURCES, **EMBED THE LINK INLINE** using the format:  \n  - *Source Name* (linked): “Headline or summary quote”  \n  - Example: [Yahoo Finance](https://example.com): “Trump tariffs to remain in effect following court ruling.”\n\n---\n\n## 📢 DELIVER THE ANSWER\n\nPRESENT A POLISHED, STRUCTURED NEWS SUMMARY:\n\n- **EVERY CLAIM, FACT, OR EVENT YOU MENTION MUST BE FOLLOWED BY AN INLINE CITATION**\n- IF YOU CANNOT FIND A SOURCE, YOU MUST OMIT THAT POINT FROM THE SUMMARY\n- NEVER MAKE GENERALIZED OR SWEEPING CLAIMS WITHOUT SPECIFIC SOURCES\n- GROUP RELATED SOURCES TO MINIMIZE REPETITION — e.g., “Multiple outlets including [Reuters](...), [BBC](...) reported…”\n\n**FORMAT EXAMPLE:**\n> The FAA has launched an investigation into Boeing's production processes following whistleblower testimony, according to [CNN](https://cnn.com/boeing-probe-2025), [Reuters](https://reuters.com/boeing-quality-checks).\n\n---\n\n## 🔒 HARD CITATION RULE\n\nEVERY BULLET, PARAGRAPH, OR CLAIM IN YOUR SUMMARY MUST HAVE AT LEAST ONE INLINE SOURCE  \n⚠️ DO NOT STATE ANY FACT WITHOUT A SOURCE  \n⚠️ DO NOT MOVE CITATIONS TO THE END — THEY MUST BE INLINE, ADJACENT TO THE CLAIM\n\n---\n\n## ❌ WHAT NOT TO DO\n\n- ❌ DO NOT GUESS, GENERALIZE, OR PARAPHRASE WITHOUT CITING\n- ❌ DO NOT INCLUDE ANY CLAIM WITHOUT A LINKED SOURCE\n- ❌ DO NOT GROUP ALL SOURCES AT THE END\n- ❌ DO NOT USE SOCIAL MEDIA SOURCES UNLESS COVERED BY LEGITIMATE OUTLETS\n- ❌ DO NOT USE OR SUMMARIZE USER-GENERATED CONTENT\n- ❌ DO NOT RETURN UNCITED OUTPUT — OMIT THE STATEMENT INSTEAD\n\n---\n\n## 🧠 TONE AND STYLE\n\n- **CLEAR, FACTUAL, PROFESSIONAL**\n- Your tone should match the credibility of a top-tier newsroom briefing\n- Avoid opinion, speculation, or filler — focus on **facts and citations**\n\n</system_prompt>"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        660,
+        -300
+      ],
+      "id": "840d343a-2e4e-45dd-8a87-fd48cd34a3ea",
+      "name": "Today's News"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Get the news related to the topic requested by the user",
+        "url": "https://www.googleapis.com/customsearch/v1",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "parametersQuery": {
+          "values": [
+            {
+              "name": "cx",
+              "valueProvider": "fieldValue",
+              "value": "c17f18c6c423648d1"
+            },
+            {
+              "name": "q"
+            },
+            {
+              "name": "tbm",
+              "valueProvider": "fieldValue",
+              "value": "nws"
+            },
+            {
+              "name": "dateRestrict",
+              "valueProvider": "fieldValue",
+              "value": "d3"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        880,
+        140
+      ],
+      "id": "aae9e7ec-573b-4657-8cbe-35ea83672b9d",
+      "name": "googleSearch1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "KsZtfTblC1wEpEsN",
+          "name": "Brave Search Header Auth"
+        },
+        "googleOAuth2Api": {
+          "id": "UtmKUsfXJQBnZd8P",
+          "name": "Google Places API"
+        },
+        "httpQueryAuth": {
+          "id": "o0czQvFOsUA1JddF",
+          "name": "Google Query Auth API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        660,
+        160
+      ],
+      "id": "07a688ba-a286-4487-a2ec-6c72c5c7e96d",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "AG2i36rIlQJn1Cj3",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ccf4033b-82ed-425a-af19-cd700e215a60",
+              "name": "session_id",
+              "value": "={{$('Merge').first().json.user }}:{{ $json.message.thread_ts }}",
+              "type": "string"
+            },
+            {
+              "id": "7d173f2a-3170-411f-b6df-da811ad2c438",
+              "name": "text",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            },
+            {
+              "id": "077a3c24-aa83-467c-827d-95fce00385b7",
+              "name": "user",
+              "value": "={{$('Merge').first().json.user }}",
+              "type": "string"
+            },
+            {
+              "id": "e74a0898-cff1-461c-a35e-8276987c5205",
+              "name": "previousConversationChain",
+              "value": "news",
+              "type": "string"
+            },
+            {
+              "id": "0943a235-53fb-4e3b-ba11-2c3ff8e41799",
+              "name": "timeAdded",
+              "value": "={{ $now }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1200,
+        0
+      ],
+      "id": "59a43c71-8d19-495d-a567-0c6abbe57f92",
+      "name": "Update Postgres With New Message"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "n8n_rodger_chat",
+          "mode": "list",
+          "cachedResultName": "n8n_rodger_chat"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "session_id": "={{ $json.session_id }}",
+            "message": "={\n  \"type\": \"Bot\",\n  \"data\": {\n    \"content\": \"{{ $('Update Postgres With New Message').first().json.text.replace(/\\\\/g, '\\\\\\\\').replace(/\"/g, '\\\\\\\"').replace(/{/g, '\\\\{').replace(/}/g, '\\\\}').replace(/\\n/g, '\\\\n').replace(/\\r/g, '') }}\",\n    \"respondingTo\": \"{{ $('Merge').first().json.user }}\",\n    \"timeAdded\": \"{{ $('Update Postgres With New Message').item.json.timeAdded }}\",\n    \"previousConversationChain\": \"news\"\n  }\n}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "session_id",
+              "displayName": "session_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1600,
+        0
+      ],
+      "id": "da73af09-0e97-459d-a1df-7c07c47f5ed6",
+      "name": "Update Thread Memory Session",
+      "credentials": {
+        "postgres": {
+          "id": "PsARREIXEOG7p5ku",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "n8n_rodger_chat",
+          "mode": "list",
+          "cachedResultName": "n8n_rodger_chat"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "session_id": "={{ $('Update Postgres With New Message').item.json.session_id }}",
+            "message": "={\n  \"type\": \"human\",\n  \"data\": {\n    \"content\": \"{{ $('Merge').first().json.text.replace(/\\\\/g, '\\\\\\\\').replace(/\"/g, '\\\\\\\"').replace(/{/g, '\\\\{').replace(/}/g, '\\\\}').replace(/\\n/g, '\\\\n').replace(/\\r/g, '') }}\",\n    \"TimeAdded\": \"{{ $now }}\"\n  }\n}\n"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "session_id",
+              "displayName": "session_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1420,
+        0
+      ],
+      "id": "0621376c-c14b-4fdb-a19d-1d2877b4a2bf",
+      "name": "Update Thread Memory Session27",
+      "credentials": {
+        "postgres": {
+          "id": "PsARREIXEOG7p5ku",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C08CE2WBQR3",
+          "mode": "list",
+          "cachedResultName": "patty_pa_input"
+        },
+        "text": "={{ $json.output }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false,
+          "link_names": true,
+          "thread_ts": {
+            "replyValues": {
+              "thread_ts": "={{ $('Merge').item.json.ts }}"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        1000,
+        0
+      ],
+      "id": "c4300f6e-6297-4014-af42-2b5d4b8d1eb0",
+      "name": "Message: User1",
+      "webhookId": "9a96e2fe-4984-438f-967f-fa8892fd73a7",
+      "credentials": {
+        "slackApi": {
+          "id": "ncQHsmHkvcVCSFNi",
+          "name": "Patty_PA_Bot API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=**Current User Request:** {{ $('Merge').item.json.text }}\n\n**Previous Conversations:** {{ $('Merge').item.json.message.data.content }}",
+        "options": {
+          "systemMessage": "=<system_prompt>\nYOU ARE A PROFESSIONAL NEWS ANALYST AND DIGITAL ASSISTANT — ARTICULATE, THOROUGH, AND TASKED WITH DELIVERING CURRENT, CITED, AND WELL-SYNTHESIZED NEWS REPORTING ON DEMAND.\n\nYOUR ROLE: CONDUCT REAL-TIME NEWS RESEARCH ON BEHALF OF THE USER.  \nYOU DO NOT GUESS. YOU LOCATE VERIFIED REPORTING AND DELIVER A CLEAR, CREDIBLE SUMMARY WITH SOURCES.\n\n---\n\n## 🗞️ NEWS RESEARCH FLOW\n\n1. ✅ **UNDERSTAND THE REQUEST**  \n   - IDENTIFY the user’s intent and **specific news topic of interest**\n\n2. ✅ **FORMULATE A NEWS-CENTRIC SEARCH QUERY**  \n   - WRITE A **FULL, NATURAL-LANGUAGE SEARCH PHRASE** suitable for professional-level news retrieval  \n   - EMPHASIZE:\n     - Specific topical keywords  \n     - Skip time qualifiers — the search tool handles those  \n     - Clarifiers that indicate **journalistic relevance** (e.g., “news on”, “coverage of”, “reporting about”)\n\n   - EXAMPLES OF EFFECTIVE NEWS QUERIES:\n     - ✅ “What is the latest news on the Tesla recall as of May 30, 2025?”\n     - ✅ “Coverage of the flooding in southern Brazil this week”\n     - ✅ “Top headlines about the AI regulation bill passed in Congress today”\n     - ✅ “What are news outlets reporting about the Boeing safety crisis this week?”\n     - ✅ “Recent developments in the Supreme Court ruling on Section 230”\n\n   - AVOID:\n     - ❌ Keyword clumps like “Boeing crash news 2025”\n     - ❌ Vague prompts like “Tell me about Tesla”\n     - ❌ Social media references like “reddit”, “instagram”, “youtube” unless directly relevant\n\n3. ✅ **TEMPORAL AWARENESS**  \n   - TODAY’S DATE IS: {{ $today.format('DDDD') }}  \n   - PRIORITIZE TIMELY INFORMATION and consider chronology when evaluating developments\n\n4. ✅ **CALL THE TOOL**\n```json\n{ \"q\": \"fully written, natural-language news search query goes here\" }\n```\n\n5. ✅ **ANALYZE THE RESULTS**\n\nREVIEW ARTICLES FROM **CREDIBLE JOURNALISTIC SOURCES** (major publications, verified outlets)\n\nEXTRACT:\n- Headlines and major developments  \n- Quotes, data, and timelines  \n- Names of involved parties or institutions  \n- Source names and publication dates  \n\n✅ CITE **MULTIPLE RELIABLE SOURCES** TO PROVIDE CONTEXT  \n✅ WHEN CITING SOURCES, **EMBED THE LINK INLINE** using the format:  \n  - *Source Name* (linked): “Headline or summary quote”  \n  - Example: [Yahoo Finance](https://example.com): “Trump tariffs to remain in effect following court ruling.”\n\n---\n\n## 📢 DELIVER THE ANSWER\n\nPRESENT A POLISHED, STRUCTURED NEWS SUMMARY:\n\n- **EVERY CLAIM, FACT, OR EVENT YOU MENTION MUST BE FOLLOWED BY AN INLINE CITATION**\n- IF YOU CANNOT FIND A SOURCE, YOU MUST OMIT THAT POINT FROM THE SUMMARY\n- NEVER MAKE GENERALIZED OR SWEEPING CLAIMS WITHOUT SPECIFIC SOURCES\n- GROUP RELATED SOURCES TO MINIMIZE REPETITION — e.g., “Multiple outlets including [Reuters](...), [BBC](...) reported…”\n\n**FORMAT EXAMPLE:**\n> The FAA has launched an investigation into Boeing's production processes following whistleblower testimony, according to [CNN](https://cnn.com/boeing-probe-2025), [Reuters](https://reuters.com/boeing-quality-checks).\n\n---\n\n## 🔒 HARD CITATION RULE\n\nEVERY BULLET, PARAGRAPH, OR CLAIM IN YOUR SUMMARY MUST HAVE AT LEAST ONE INLINE SOURCE  \n⚠️ DO NOT STATE ANY FACT WITHOUT A SOURCE  \n⚠️ DO NOT MOVE CITATIONS TO THE END — THEY MUST BE INLINE, ADJACENT TO THE CLAIM\n\n---\n\n## ❌ WHAT NOT TO DO\n\n- ❌ DO NOT GUESS, GENERALIZE, OR PARAPHRASE WITHOUT CITING\n- ❌ DO NOT INCLUDE ANY CLAIM WITHOUT A LINKED SOURCE\n- ❌ DO NOT GROUP ALL SOURCES AT THE END\n- ❌ DO NOT USE SOCIAL MEDIA SOURCES UNLESS COVERED BY LEGITIMATE OUTLETS\n- ❌ DO NOT USE OR SUMMARIZE USER-GENERATED CONTENT\n- ❌ DO NOT RETURN UNCITED OUTPUT — OMIT THE STATEMENT INSTEAD\n\n---\n\n## 🧠 TONE AND STYLE\n\n- **CLEAR, FACTUAL, PROFESSIONAL**\n- Your tone should match the credibility of a top-tier newsroom briefing\n- Avoid opinion, speculation, or filler — focus on **facts and citations**\n\n</system_prompt>"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        660,
+        0
+      ],
+      "id": "a69d13d1-2dba-4ac1-a9ef-ed6bdfa802f5",
+      "name": "Recent News 0-3 Days"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Get the news related to the topic requested by the user",
+        "url": "https://www.googleapis.com/customsearch/v1",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "parametersQuery": {
+          "values": [
+            {
+              "name": "cx",
+              "valueProvider": "fieldValue",
+              "value": "c17f18c6c423648d1"
+            },
+            {
+              "name": "q"
+            },
+            {
+              "name": "tbm",
+              "valueProvider": "fieldValue",
+              "value": "nws"
+            },
+            {
+              "name": "dateRestrict",
+              "valueProvider": "fieldValue",
+              "value": "w1"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        880,
+        460
+      ],
+      "id": "2ca4f2a6-5edd-4334-b17c-290804173b21",
+      "name": "googleSearch2",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "KsZtfTblC1wEpEsN",
+          "name": "Brave Search Header Auth"
+        },
+        "googleOAuth2Api": {
+          "id": "UtmKUsfXJQBnZd8P",
+          "name": "Google Places API"
+        },
+        "httpQueryAuth": {
+          "id": "o0czQvFOsUA1JddF",
+          "name": "Google Query Auth API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        660,
+        480
+      ],
+      "id": "1dd210dc-69ab-49bb-bedb-d12ea57278df",
+      "name": "OpenAI Chat Model3",
+      "credentials": {
+        "openAiApi": {
+          "id": "AG2i36rIlQJn1Cj3",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ccf4033b-82ed-425a-af19-cd700e215a60",
+              "name": "session_id",
+              "value": "={{$('Merge').first().json.user }}:{{ $json.message.thread_ts }}",
+              "type": "string"
+            },
+            {
+              "id": "7d173f2a-3170-411f-b6df-da811ad2c438",
+              "name": "text",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            },
+            {
+              "id": "077a3c24-aa83-467c-827d-95fce00385b7",
+              "name": "user",
+              "value": "={{$('Merge').first().json.user }}",
+              "type": "string"
+            },
+            {
+              "id": "e74a0898-cff1-461c-a35e-8276987c5205",
+              "name": "previousConversationChain",
+              "value": "news",
+              "type": "string"
+            },
+            {
+              "id": "0943a235-53fb-4e3b-ba11-2c3ff8e41799",
+              "name": "timeAdded",
+              "value": "={{ $now }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1200,
+        320
+      ],
+      "id": "002e6cdb-3147-42b9-ab54-0f20b17cdbb6",
+      "name": "Update Postgres With New Message1"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "n8n_rodger_chat",
+          "mode": "list",
+          "cachedResultName": "n8n_rodger_chat"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "session_id": "={{ $json.session_id }}",
+            "message": "={\n  \"type\": \"Bot\",\n  \"data\": {\n    \"content\": \"{{ $('Update Postgres With New Message1').first().json.text.replace(/\\\\/g, '\\\\\\\\').replace(/\"/g, '\\\\\\\"').replace(/{/g, '\\\\{').replace(/}/g, '\\\\}').replace(/\\n/g, '\\\\n').replace(/\\r/g, '') }}\",\n    \"respondingTo\": \"{{ $('Merge').first().json.user }}\",\n    \"timeAdded\": \"{{ $('Update Postgres With New Message1').item.json.timeAdded }}\",\n    \"previousConversationChain\": \"news\"\n  }\n}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "session_id",
+              "displayName": "session_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1600,
+        320
+      ],
+      "id": "b6edbb52-51a7-415a-a15b-ce4fa943ecf0",
+      "name": "Update Thread Memory Session1",
+      "credentials": {
+        "postgres": {
+          "id": "PsARREIXEOG7p5ku",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "n8n_rodger_chat",
+          "mode": "list",
+          "cachedResultName": "n8n_rodger_chat"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "session_id": "={{ $('Update Postgres With New Message1').item.json.session_id }}",
+            "message": "={\n  \"type\": \"human\",\n  \"data\": {\n    \"content\": \"{{ $('Merge').first().json.text.replace(/\\\\/g, '\\\\\\\\').replace(/\"/g, '\\\\\\\"').replace(/{/g, '\\\\{').replace(/}/g, '\\\\}').replace(/\\n/g, '\\\\n').replace(/\\r/g, '') }}\",\n    \"TimeAdded\": \"{{ $now }}\"\n  }\n}\n"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "session_id",
+              "displayName": "session_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1420,
+        320
+      ],
+      "id": "f2ddad3f-af09-409f-8239-aead258975ba",
+      "name": "Update Thread Memory Session28",
+      "credentials": {
+        "postgres": {
+          "id": "PsARREIXEOG7p5ku",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C08CE2WBQR3",
+          "mode": "list",
+          "cachedResultName": "patty_pa_input"
+        },
+        "text": "={{ $json.output }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false,
+          "link_names": true,
+          "thread_ts": {
+            "replyValues": {
+              "thread_ts": "={{ $('Merge').item.json.ts }}"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        1000,
+        320
+      ],
+      "id": "5e25a6ae-bebe-4064-affd-9cd3a8b4e69d",
+      "name": "Message: User2",
+      "webhookId": "0c7b298b-8dab-4a4e-9c13-92af26d3e121",
+      "credentials": {
+        "slackApi": {
+          "id": "ncQHsmHkvcVCSFNi",
+          "name": "Patty_PA_Bot API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=**Current User Request:** {{ $('Merge').item.json.text }}\n\n**Previous Conversations:** {{ $('Merge').item.json.message.data.content }}",
+        "options": {
+          "systemMessage": "=<system_prompt>\nYOU ARE A PROFESSIONAL NEWS ANALYST AND DIGITAL ASSISTANT — ARTICULATE, THOROUGH, AND TASKED WITH DELIVERING CURRENT, CITED, AND WELL-SYNTHESIZED NEWS REPORTING ON DEMAND.\n\nYOUR ROLE: CONDUCT REAL-TIME NEWS RESEARCH ON BEHALF OF THE USER.  \nYOU DO NOT GUESS. YOU LOCATE VERIFIED REPORTING AND DELIVER A CLEAR, CREDIBLE SUMMARY WITH SOURCES.\n\n---\n\n## 🗞️ NEWS RESEARCH FLOW\n\n1. ✅ **UNDERSTAND THE REQUEST**  \n   - IDENTIFY the user’s intent and **specific news topic of interest**\n\n2. ✅ **FORMULATE A NEWS-CENTRIC SEARCH QUERY**  \n   - WRITE A **FULL, NATURAL-LANGUAGE SEARCH PHRASE** suitable for professional-level news retrieval  \n   - EMPHASIZE:\n     - Specific topical keywords  \n     - Skip time qualifiers — the search tool handles those  \n     - Clarifiers that indicate **journalistic relevance** (e.g., “news on”, “coverage of”, “reporting about”)\n\n   - EXAMPLES OF EFFECTIVE NEWS QUERIES:\n     - ✅ “What is the latest news on the Tesla recall as of May 30, 2025?”\n     - ✅ “Coverage of the flooding in southern Brazil this week”\n     - ✅ “Top headlines about the AI regulation bill passed in Congress today”\n     - ✅ “What are news outlets reporting about the Boeing safety crisis this week?”\n     - ✅ “Recent developments in the Supreme Court ruling on Section 230”\n\n   - AVOID:\n     - ❌ Keyword clumps like “Boeing crash news 2025”\n     - ❌ Vague prompts like “Tell me about Tesla”\n     - ❌ Social media references like “reddit”, “instagram”, “youtube” unless directly relevant\n\n3. ✅ **TEMPORAL AWARENESS**  \n   - TODAY’S DATE IS: {{ $today.format('DDDD') }}  \n   - PRIORITIZE TIMELY INFORMATION and consider chronology when evaluating developments\n\n4. ✅ **CALL THE TOOL**\n```json\n{ \"q\": \"fully written, natural-language news search query goes here\" }\n```\n\n5. ✅ **ANALYZE THE RESULTS**\n\nREVIEW ARTICLES FROM **CREDIBLE JOURNALISTIC SOURCES** (major publications, verified outlets)\n\nEXTRACT:\n- Headlines and major developments  \n- Quotes, data, and timelines  \n- Names of involved parties or institutions  \n- Source names and publication dates  \n\n✅ CITE **MULTIPLE RELIABLE SOURCES** TO PROVIDE CONTEXT  \n✅ WHEN CITING SOURCES, **EMBED THE LINK INLINE** using the format:  \n  - *Source Name* (linked): “Headline or summary quote”  \n  - Example: [Yahoo Finance](https://example.com): “Trump tariffs to remain in effect following court ruling.”\n\n---\n\n## 📢 DELIVER THE ANSWER\n\nPRESENT A POLISHED, STRUCTURED NEWS SUMMARY:\n\n- **EVERY CLAIM, FACT, OR EVENT YOU MENTION MUST BE FOLLOWED BY AN INLINE CITATION**\n- IF YOU CANNOT FIND A SOURCE, YOU MUST OMIT THAT POINT FROM THE SUMMARY\n- NEVER MAKE GENERALIZED OR SWEEPING CLAIMS WITHOUT SPECIFIC SOURCES\n- GROUP RELATED SOURCES TO MINIMIZE REPETITION — e.g., “Multiple outlets including [Reuters](...), [BBC](...) reported…”\n\n**FORMAT EXAMPLE:**\n> The FAA has launched an investigation into Boeing's production processes following whistleblower testimony, according to [CNN](https://cnn.com/boeing-probe-2025), [Reuters](https://reuters.com/boeing-quality-checks).\n\n---\n\n## 🔒 HARD CITATION RULE\n\nEVERY BULLET, PARAGRAPH, OR CLAIM IN YOUR SUMMARY MUST HAVE AT LEAST ONE INLINE SOURCE  \n⚠️ DO NOT STATE ANY FACT WITHOUT A SOURCE  \n⚠️ DO NOT MOVE CITATIONS TO THE END — THEY MUST BE INLINE, ADJACENT TO THE CLAIM\n\n---\n\n## ❌ WHAT NOT TO DO\n\n- ❌ DO NOT GUESS, GENERALIZE, OR PARAPHRASE WITHOUT CITING\n- ❌ DO NOT INCLUDE ANY CLAIM WITHOUT A LINKED SOURCE\n- ❌ DO NOT GROUP ALL SOURCES AT THE END\n- ❌ DO NOT USE SOCIAL MEDIA SOURCES UNLESS COVERED BY LEGITIMATE OUTLETS\n- ❌ DO NOT USE OR SUMMARIZE USER-GENERATED CONTENT\n- ❌ DO NOT RETURN UNCITED OUTPUT — OMIT THE STATEMENT INSTEAD\n\n---\n\n## 🧠 TONE AND STYLE\n\n- **CLEAR, FACTUAL, PROFESSIONAL**\n- Your tone should match the credibility of a top-tier newsroom briefing\n- Avoid opinion, speculation, or filler — focus on **facts and citations**\n\n</system_prompt>"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        660,
+        320
+      ],
+      "id": "c776fd50-10b7-44fb-ba2f-dad66da69c65",
+      "name": "This Week's News"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2e22edd4-535d-4b39-9405-3e1cbe653828",
+              "leftValue": "={{ $json.output.search_subject }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "7cc761fb-1f12-47d0-b90b-44570e77d09d",
+              "leftValue": "={{ $json.output.timeframe }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        240,
+        -400
+      ],
+      "id": "24ef915a-c10b-4629-ba7d-3518507917c9",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        660,
+        -500
+      ],
+      "id": "3b710595-23bb-4c8d-98ee-4945bfb72591",
+      "name": "OpenAI Chat Model4",
+      "credentials": {
+        "openAiApi": {
+          "id": "AG2i36rIlQJn1Cj3",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ccf4033b-82ed-425a-af19-cd700e215a60",
+              "name": "session_id",
+              "value": "={{$('Merge').first().json.user }}:{{ $json.message.thread_ts }}",
+              "type": "string"
+            },
+            {
+              "id": "7d173f2a-3170-411f-b6df-da811ad2c438",
+              "name": "text",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            },
+            {
+              "id": "077a3c24-aa83-467c-827d-95fce00385b7",
+              "name": "user",
+              "value": "={{$('Merge').first().json.user }}",
+              "type": "string"
+            },
+            {
+              "id": "e74a0898-cff1-461c-a35e-8276987c5205",
+              "name": "previousConversationChain",
+              "value": "news",
+              "type": "string"
+            },
+            {
+              "id": "0943a235-53fb-4e3b-ba11-2c3ff8e41799",
+              "name": "timeAdded",
+              "value": "={{ $now }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1200,
+        -660
+      ],
+      "id": "fbe88d72-73c4-428a-a56d-57bfecda63ef",
+      "name": "Update Postgres With New Message11"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "n8n_rodger_chat",
+          "mode": "list",
+          "cachedResultName": "n8n_rodger_chat"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "session_id": "={{ $json.session_id }}",
+            "message": "={\n  \"type\": \"Bot\",\n  \"data\": {\n    \"content\": \"{{ $('Update Postgres With New Message11').first().json.text.replace(/\\\\/g, '\\\\\\\\').replace(/\"/g, '\\\\\\\"').replace(/{/g, '\\\\{').replace(/}/g, '\\\\}').replace(/\\n/g, '\\\\n').replace(/\\r/g, '') }}\",\n    \"respondingTo\": \"{{ $('Merge').first().json.user }}\",\n    \"timeAdded\": \"{{ $('Update Postgres With New Message11').item.json.timeAdded }}\",\n    \"previousConversationChain\": \"news\"\n  }\n}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "session_id",
+              "displayName": "session_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1600,
+        -660
+      ],
+      "id": "eeb7d631-b399-499b-9f61-7090b5f2f7c7",
+      "name": "Update Thread Memory Session29",
+      "credentials": {
+        "postgres": {
+          "id": "PsARREIXEOG7p5ku",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "n8n_rodger_chat",
+          "mode": "list",
+          "cachedResultName": "n8n_rodger_chat"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "session_id": "={{ $('Update Postgres With New Message11').item.json.session_id }}",
+            "message": "={\n  \"type\": \"human\",\n  \"data\": {\n    \"content\": \"{{ $('Merge').first().json.text.replace(/\\\\/g, '\\\\\\\\').replace(/\"/g, '\\\\\\\"').replace(/{/g, '\\\\{').replace(/}/g, '\\\\}').replace(/\\n/g, '\\\\n').replace(/\\r/g, '') }}\",\n    \"TimeAdded\": \"{{ $now }}\"\n  }\n}\n"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "session_id",
+              "displayName": "session_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "object",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1420,
+        -660
+      ],
+      "id": "76a375fd-0b05-4c2f-bbdd-85aecfc11cb9",
+      "name": "Update Thread Memory Session30",
+      "credentials": {
+        "postgres": {
+          "id": "PsARREIXEOG7p5ku",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C08CE2WBQR3",
+          "mode": "list",
+          "cachedResultName": "patty_pa_input"
+        },
+        "text": "={{ $json.output }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false,
+          "link_names": true,
+          "thread_ts": {
+            "replyValues": {
+              "thread_ts": "={{ $('Merge').item.json.ts }}"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        1000,
+        -660
+      ],
+      "id": "b25fbc07-5349-48ba-a1c8-ba6c6523db7e",
+      "name": "Message: User3",
+      "webhookId": "ec705d5a-161f-4d2f-b819-2e067acbd84e",
+      "credentials": {
+        "slackApi": {
+          "id": "ncQHsmHkvcVCSFNi",
+          "name": "Patty_PA_Bot API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=**Current User Request:** {{ $('Merge').item.json.text }}\n\n**Previous Conversations:** {{ $('Merge').item.json.message.data.content }}\n\n**The Search Subject the Model Determined:** {{ $json.output.search_subject }}\n\n**The Timeframe the Model Determined:** {{ $json.output.timeframe }}",
+        "options": {
+          "systemMessage": "=<system_prompt>\n\nYOU ARE A PROFESSIONAL DIGITAL ASSISTANT — HELPFUL, CLEAR, AND USER-FOCUSED — TASKED WITH CLARIFYING NEWS REQUESTS THAT ARRIVE WITH MISSING INFORMATION.\n\n## ROLE\nWHENEVER A USER’S MESSAGE IS MISSING EITHER A CLEAR TOPIC OR A TIMEFRAME FOR A NEWS SEARCH, YOUR JOB IS TO REQUEST JUST ENOUGH CLARIFICATION — POLITELY AND CONCISELY — TO PROCEED ACCURATELY.\n\n## MISSION\nREVIEW THE STRUCTURED DATA FROM THE EXTRACTION AGENT:\n\n- `search_subject`: The news topic the user is asking about, or it's empty  \n- `timeframe`: One of the following — ‘today’, ‘recent’, or ‘week’ — or empty\n\n---\n\n## WHEN RESPONDING\n\n- IF ONLY `search_subject` IS MISSING:\n  - Open with a friendly and clear message:  \n    *“I’m ready to find the headlines — could you tell me what topic you’re interested in?”*  \n  - Offer a gentle nudge:  \n    *“Is it something like politics, technology, business, or something else?”*\n\n- IF ONLY `timeframe` IS MISSING:\n  - Open by acknowledging the need for timing:  \n    *“To narrow things down, could you let me know the timeframe?”*  \n  - Provide options:  \n    *“Should I search for stories from today, the past few days, or the last week?”*\n\n- IF **BOTH** FIELDS ARE MISSING:\n  - Open with a neutral clarification prompt:  \n    *“I’ll need a bit more information before I can find the right stories.”*  \n  - Request both topic and timeframe:  \n    *“What news topic are you interested in — and should I search for today, recent days, or the past week?”*\n\n---\n\n## STYLE RULES\n\n- ALWAYS speak in a friendly, neutral, and professional tone  \n- Use em dashes — not parentheses or ellipses  \n- DO NOT display field names or technical terms  \n- DO NOT mention missing data — instead, clearly and naturally ask the user for clarification  \n- NEVER sound robotic — keep communication natural and user-focused\n\n---\n\n## EXAMPLES\n\n**Case 1 — Missing Subject:**  \n> “I’m ready to find the headlines — could you tell me what topic you’re interested in? Is it something like politics, technology, business, or something else?”\n\n**Case 2 — Missing Timeframe:**  \n> “To narrow things down, could you let me know the timeframe? Should I search for stories from today, the past few days, or the last week?”\n\n**Case 3 — Missing Both:**  \n> “I’ll need a bit more information before I can find the right stories. What news topic are you interested in — and should I search for today, recent days, or the past week?”\n\n---\n\n## WHAT NOT TO DO\n\n- ❌ DO NOT list field names like ‘search_subject’ or ‘timeframe’  \n- ❌ DO NOT mention JSON, extraction logic, or structured data  \n- ❌ DO NOT ask robotic questions like ‘Please provide a topic’  \n- ❌ DO NOT reference internal systems or break character  \n\n</system_prompt>"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        660,
+        -660
+      ],
+      "id": "ca2465f5-05ac-4035-b080-4925adca2407",
+      "name": "Clarify Subject Or Date Range"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "binaryPropertyName": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -1180,
+        -400
+      ],
+      "id": "e15e6aef-f836-480c-8e52-6ba9559941bc",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "AG2i36rIlQJn1Cj3",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e21d5b0b-2e72-4b5b-a292-a11bce246b66",
+              "name": "text",
+              "value": "={{ $('Code').item.json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1380,
+        -220
+      ],
+      "id": "7e33ec04-bd7e-47b4-a515-cdf1b8a05b49",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.files[0].url_private_download }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "slackOAuth2Api",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "binary"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1380,
+        -400
+      ],
+      "id": "b2bdbc84-d69b-48b4-993d-234acd015136",
+      "name": "HTTP Request1",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "SMZHJs3a87a9qsPV",
+          "name": "Slack OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "32c5f0ec-43b0-4165-816e-dd4e5c7fa682",
+              "name": "text",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "2e1b6dce-0eb6-419a-a1d5-83b5ec000951",
+              "name": "user",
+              "value": "={{ $('Code').item.json.user }}",
+              "type": "string"
+            },
+            {
+              "id": "94c37bf0-fef3-43c6-9dc7-640ea037c3f4",
+              "name": "ts",
+              "value": "={{ $('Code').item.json.ts }}",
+              "type": "string"
+            },
+            {
+              "id": "b8b90c8c-a79f-4481-8efa-dfdb94fadff8",
+              "name": "thread_ts",
+              "value": "={{ $('Code').item.json.thread_ts }}",
+              "type": "string"
+            },
+            {
+              "id": "0144689f-7197-4893-9095-9411b749050e",
+              "name": "session_id",
+              "value": "={{ $('Code').item.json.session_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1000,
+        -220
+      ],
+      "id": "4d413534-6f99-4ad6-b390-505ecd501dbf",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const event = $json;\n\nconst isThread = !!event.thread_ts;\nconst session_id = isThread\n  ? `${event.user}:${event.thread_ts}`\n  : `${event.user}:top`;\n\nconst files = event.files || [];\n\nreturn [{\n  json: {\n    session_id,\n    user: event.user,\n    text: event.text || \"\",\n    ts: event.ts,\n    thread_ts: event.thread_ts || null,\n    is_thread: isThread,\n    files // <== array of files stays bundled\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1780,
+        -220
+      ],
+      "id": "d09f4d05-0449-4fda-8dee-416d59c9721f",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "fieldsToMatchString": "session_id",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        -400,
+        -200
+      ],
+      "id": "2e9f9e8e-b77e-42f8-a44e-ccdcc7f9f7ed",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "n8n_rodger_chat",
+          "mode": "list",
+          "cachedResultName": "n8n_rodger_chat"
+        },
+        "limit": 20,
+        "where": {
+          "values": [
+            {
+              "column": "session_id",
+              "value": "={{ $json.session_id }}"
+            }
+          ]
+        },
+        "combineConditions": "OR",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -720,
+        0
+      ],
+      "id": "69237772-3f0f-48b6-bde5-2237de74695a",
+      "name": "Pull Thread Context",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "PsARREIXEOG7p5ku",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const sessionId = items[0]?.json.session_id || null;\n\n// Step 1: Extract and sort messages by TimeAdded\nconst sortedItems = [...items].sort((a, b) => {\n    const aTime = a.json.message?.data?.TimeAdded || a.json.message?.data?.timeAdded;\n    const bTime = b.json.message?.data?.TimeAdded || b.json.message?.data?.timeAdded;\n    const aTimestamp = aTime ? new Date(aTime).getTime() : 0;\n    const bTimestamp = bTime ? new Date(bTime).getTime() : 0;\n    return aTimestamp - bTimestamp;\n});\n\n// Step 2: Prepare formatted message content and collect meta fields\nconst formattedMessages = [];\nconst addedContents = new Set(); // Track which messages we’ve already added\n\nlet lastAddedAt = null;\nlet previousConversationChain = '';\n\nfor (let i = 0; i < sortedItems.length; i++) {\n    const item = sortedItems[i];\n    const data = item.json.message?.data || {};\n    const content = data.content;\n    const timeAdded = data.TimeAdded || data.timeAdded;\n    const chain = data.previousConversationChain;\n\n    // Skip empty or duplicate content\n    if (content && !addedContents.has(content)) {\n        formattedMessages.push(`--- Message ${formattedMessages.length + 1} ---\\n${content}`);\n        addedContents.add(content);\n    }\n\n    // Track most recent TimeAdded\n    if (timeAdded) {\n        const time = new Date(timeAdded).toISOString();\n        if (!lastAddedAt || new Date(time) > new Date(lastAddedAt)) {\n            lastAddedAt = time;\n        }\n    }\n\n    // Track most recent non-null previousConversationChain\n    if (chain && chain !== 'null') {\n        previousConversationChain = chain;\n    }\n}\n\nconst combined = formattedMessages.join('\\n\\n');\n\n// Final output\nreturn [\n    {\n        json: {\n            session_id: sessionId,\n            message: {\n                data: {\n                    content: combined,\n                    previousConversationChain: previousConversationChain || combined,\n                    lastAddedAt: lastAddedAt || new Date().toISOString()\n                }\n            }\n        }\n    }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -580,
+        -140
+      ],
+      "id": "a837166a-4843-46f4-a6a1-4cb59e6deef0",
+      "name": "Code3"
+    },
+    {
+      "parameters": {
+        "trigger": [
+          "any_event"
+        ],
+        "channelId": {
+          "__rl": true,
+          "value": "C08CE2WBQR3",
+          "mode": "list",
+          "cachedResultName": "patty_pa_input"
+        },
+        "options": {
+          "userIds": [
+            "U08C7BMMZHD"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.slackTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1980,
+        -220
+      ],
+      "id": "cb453bb8-4d72-4848-b80e-5c530a6382b8",
+      "name": "Slack Trigger",
+      "webhookId": "75f54052-651a-4cdd-8f4d-36fb5a6e52c9",
+      "credentials": {
+        "slackApi": {
+          "id": "ncQHsmHkvcVCSFNi",
+          "name": "Patty_PA_Bot API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Code').item.json.files[0].filetype }}",
+                    "rightValue": "m4a",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "1cfe7794-000d-4c0c-ae1e-4495ff51ed51"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Voice"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "bf6e0e8d-7b4f-496b-a5f1-acf774633f32",
+                    "leftValue": "={{ $('Code').item.json.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Text"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -1620,
+        -220
+      ],
+      "id": "32120db3-f8c8-4e90-800a-840519c2c311",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "23381507-3da6-461d-91db-2a42a31bfa84",
+              "leftValue": "={{ $('Code').first().json.session_id }}",
+              "rightValue": "top",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -900,
+        -60
+      ],
+      "id": "3915e372-661d-42f8-b0e6-d434b22fc084",
+      "name": "If1"
+    }
+  ],
+  "pinData": {
+    "Slack Trigger": [
+      {
+        "json": {
+          "user": "U08CK2TKQFN",
+          "type": "message",
+          "ts": "1749323972.868669",
+          "client_msg_id": "a17486ca-fc0b-4bc7-9b4d-899a6b456c68",
+          "text": "What is going on in the news?",
+          "team": "T08C21180HM",
+          "blocks": [
+            {
+              "type": "rich_text",
+              "block_id": "v1GMR",
+              "elements": [
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "What is going on in the news?"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "channel": "C08CE2WBQR3",
+          "event_ts": "1749323972.868669",
+          "channel_type": "channel"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "googleSearch": {
+      "ai_tool": [
+        [
+          {
+            "node": "Today's News",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Today's News",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Postgres With New Message10": {
+      "main": [
+        [
+          {
+            "node": "Update Thread Memory Session26",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Thread Memory Session26": {
+      "main": [
+        [
+          {
+            "node": "Update Thread Memory Session25",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message: User": {
+      "main": [
+        [
+          {
+            "node": "Update Postgres With New Message10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Today's News": {
+      "main": [
+        [
+          {
+            "node": "Message: User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "googleSearch1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Recent News 0-3 Days",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Recent News 0-3 Days",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Postgres With New Message": {
+      "main": [
+        [
+          {
+            "node": "Update Thread Memory Session27",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Thread Memory Session27": {
+      "main": [
+        [
+          {
+            "node": "Update Thread Memory Session",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message: User1": {
+      "main": [
+        [
+          {
+            "node": "Update Postgres With New Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recent News 0-3 Days": {
+      "main": [
+        [
+          {
+            "node": "Message: User1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "googleSearch2": {
+      "ai_tool": [
+        [
+          {
+            "node": "This Week's News",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "This Week's News",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Postgres With New Message1": {
+      "main": [
+        [
+          {
+            "node": "Update Thread Memory Session28",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Thread Memory Session28": {
+      "main": [
+        [
+          {
+            "node": "Update Thread Memory Session1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message: User2": {
+      "main": [
+        [
+          {
+            "node": "Update Postgres With New Message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "This Week's News": {
+      "main": [
+        [
+          {
+            "node": "Message: User2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Clarify Subject Or Date Range",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Today's News",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Recent News 0-3 Days",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "This Week's News",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Clarify Subject Or Date Range",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Postgres With New Message11": {
+      "main": [
+        [
+          {
+            "node": "Update Thread Memory Session30",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Thread Memory Session30": {
+      "main": [
+        [
+          {
+            "node": "Update Thread Memory Session29",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message: User3": {
+      "main": [
+        [
+          {
+            "node": "Update Postgres With New Message11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clarify Subject Or Date Range": {
+      "main": [
+        [
+          {
+            "node": "Message: User3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pull Thread Context": {
+      "main": [
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code3": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Slack Trigger": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Pull Thread Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "cd37ebf7-0d78-4666-b6f5-41df8cca1a3f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "755f8e384ae78a7dedbf592ffbd1a01c56d86a07241ef8bcfb307935a604c790"
+  },
+  "id": "UIN5vR3VTdezhOyo",
+  "tags": [
+    {
+      "createdAt": "2025-03-10T21:36:47.226Z",
+      "updatedAt": "2025-03-10T21:36:47.226Z",
+      "id": "aFiyGtZ7jL976uPD",
+      "name": "Free Giveaways"
+    }
+  ]
+}

@@ -1,0 +1,417 @@
+{
+  "name": "AT 42 - Product placements",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -672,
+        -16
+      ],
+      "id": "0d857820-33fc-4e2e-a924-5a62be1477e5",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "35659353-d8e2-4677-876b-401b549605a0",
+              "name": "Fal.ai",
+              "type": "string",
+              "value": "13999664-e25a-47a2-b1e3-de7633c495f7:7889ac2b8f3eba8287c3a2cf3b15bea3"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f7c8ed1e-0ffc-4a23-a419-06d085a3d34b",
+      "name": "Set API Keys",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -448,
+        -16
+      ],
+      "notesInFlow": true,
+      "typeVersion": 3.4,
+      "notes": "Set your API keys here"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appbAxDxSATCXMvED",
+          "mode": "list",
+          "cachedResultName": "AT 42 - Product placement",
+          "cachedResultUrl": "https://airtable.com/appbAxDxSATCXMvED"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbldVmAdwTClCVC1S",
+          "mode": "list",
+          "cachedResultName": "Table 1",
+          "cachedResultUrl": "https://airtable.com/appbAxDxSATCXMvED/tbldVmAdwTClCVC1S"
+        },
+        "filterByFormula": "NOT({Status} = 'Done')",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -224,
+        -16
+      ],
+      "id": "afc22100-9528-4c57-8ad3-232e28e71b78",
+      "name": "Search records",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "bayZlSl5jp9utzQ6",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://queue.fal.run/easel-ai/product-photoshoot",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Key {{ $('Set API Keys').item.json.Fal.ai }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "product_image",
+              "value": "={{ $json['Product Image'][0].url }}"
+            },
+            {
+              "name": "product_description",
+              "value": "={{ $json['Product Description'] }}"
+            },
+            {
+              "name": "scene",
+              "value": "={{ $json.Scene }}"
+            },
+            {
+              "name": "product_placement",
+              "value": "={{ $json['Product Placement'] }}"
+            },
+            {
+              "name": "magic_blend_enabled",
+              "value": "true"
+            },
+            {
+              "name": "output_format",
+              "value": "={{ $json['Output Format'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        -16
+      ],
+      "id": "198fd3e6-7eac-42be-8737-699ce088484a",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "amount": 30
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        -16
+      ],
+      "id": "b32bdb6c-2724-4b61-a7d7-79a4f55f0bf9",
+      "name": "Wait",
+      "webhookId": "09d0d985-2319-4cde-b983-76e9bfae5308"
+    },
+    {
+      "parameters": {
+        "url": "=https://queue.fal.run/easel-ai/product-photoshoot/requests/{{ $json.request_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Key {{ $('Set API Keys').item.json.Fal.ai }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        448,
+        -16
+      ],
+      "id": "26e29749-e92a-4179-a864-e429749b6f25",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appbAxDxSATCXMvED",
+          "mode": "list",
+          "cachedResultName": "AT 42 - Product placement",
+          "cachedResultUrl": "https://airtable.com/appbAxDxSATCXMvED"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbldVmAdwTClCVC1S",
+          "mode": "list",
+          "cachedResultName": "Table 1",
+          "cachedResultUrl": "https://airtable.com/appbAxDxSATCXMvED/tbldVmAdwTClCVC1S"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Search records').item.json.id }}",
+            "Status": "Done",
+            "Final result": "=[\n  { \"url\": \"{{ $json.image.url }}\" }\n]"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Scene",
+              "displayName": "Scene",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Product Description",
+              "displayName": "Product Description",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Product Image",
+              "displayName": "Product Image",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Product Placement",
+              "displayName": "Product Placement",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Output Format",
+              "displayName": "Output Format",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "4:3",
+                  "value": "4:3"
+                },
+                {
+                  "name": "16:9",
+                  "value": "16:9"
+                },
+                {
+                  "name": "9:16",
+                  "value": "9:16"
+                },
+                {
+                  "name": "1:1",
+                  "value": "1:1"
+                },
+                {
+                  "name": "1:1 (2k)",
+                  "value": "1:1 (2k)"
+                },
+                {
+                  "name": "1:1 (1k, Turbo)",
+                  "value": "1:1 (1k, Turbo)"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Todo",
+                  "value": "Todo"
+                },
+                {
+                  "name": "Done",
+                  "value": "Done"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Final result",
+              "displayName": "Final result",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        672,
+        -16
+      ],
+      "id": "4c678825-ab9e-43b0-8018-c187004ec6be",
+      "name": "Update record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "bayZlSl5jp9utzQ6",
+          "name": "Airtable account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Set API Keys",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set API Keys": {
+      "main": [
+        [
+          {
+            "node": "Search records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search records": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Update record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ac5552d7-e799-4928-81d1-f1a8419af32c",
+  "meta": {
+    "instanceId": "bd95e83f261cee4e80d731cb58d1c4799127663205327ab783b076c62312dcdf"
+  },
+  "id": "OMTwbO0vrqwfO8w4",
+  "tags": []
+}

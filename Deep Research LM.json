@@ -1,0 +1,402 @@
+{
+  "name": "Deep Research LM",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "70901516-1931-4183-a8f9-caa33c25d3dd",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "158662b6-239c-4cbf-a2f0-730ae75bf2bd",
+      "name": "Webhook",
+      "webhookId": "70901516-1931-4183-a8f9-caa33c25d3dd"
+    },
+    {
+      "parameters": {
+        "base": {
+          "__rl": true,
+          "value": "appk3zsocZmCpMe6M",
+          "mode": "list",
+          "cachedResultName": "Deep Research",
+          "cachedResultUrl": "https://airtable.com/appk3zsocZmCpMe6M"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblsXqsNLNTyzLsSS",
+          "mode": "list",
+          "cachedResultName": "Table 1",
+          "cachedResultUrl": "https://airtable.com/appk3zsocZmCpMe6M/tblsXqsNLNTyzLsSS"
+        },
+        "id": "={{ $json.query.recordId }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "1dd090a8-34a1-4c57-91ce-b9d601d928f6",
+      "name": "Get a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "7CWIYitnBJMr6lSU",
+          "name": "Airtable"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7df54819-20cf-41d9-9656-73587859d99a",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "completed",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        192
+      ],
+      "id": "d7060534-dbed-4d30-a35e-30337cb33056",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.openai.com/v1/responses/{{ $json.id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer yourAPIkey"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        176
+      ],
+      "id": "43c9603e-4fa2-40dd-a14f-30fda802b930",
+      "name": "Get Request"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/responses",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer yourAPIkey"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"o3-deep-research\",\n  \"input\": \"You are a senior creative strategist onboarding a new brand.\\n\\nResearch the brand at {{ $json['Website URL'] }} and return insights in this exact structure:\\n\\nExecutive Summary (<=200 words):\\n[summary]\\n\\nTarget Audience:\\n[list key demographics, psychographics, motivations]\\n\\nPain Points:\\n[list the main customer problems the brand promises to solve]\\n\\nUnique Selling Proposition (USP):\\n[what differentiates the brand clearly]\\n\\nFull Research Report:\\n[detailed findings]\\n\\nRequirements:\\n- Keep sections in this order with these exact headers.\\n- Be specific and actionable for ad/creative teams.\",\n  \"background\": true,\n  \"tools\": [\n    { \"type\": \"web_search_preview\" }\n  ]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "70e5073c-ac8c-48cf-a24f-8c2f7c73c8ee",
+      "name": "Post Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "// --- 1) Pull final markdown text from Deep Research response\nlet text = \"\";\nif (Array.isArray($json.output)) {\n  const msg = $json.output.find(o => o.type === \"message\");\n  if (msg?.content?.[0]?.text) text = msg.content[0].text;\n}\nif (!text) text = $json.report || $json.content || \"\";\n\n// --- 2) Helper: capture everything AFTER a header/label until the next header/label\n// Supports either \"## Heading\" or \"Heading:\"\n// Pass a REGEX PATTERN (already escaped) for the label text.\nfunction grabSection(labelPattern) {\n  // Next-section detector: either another H2 or a Capitalized Label:\n  const nextBoundary = `\\\\n(?:##\\\\s*[A-Z]|[A-Z][A-Za-z&/()' -]{1,60}:)`;\n\n  // Build a regex that matches:\n  //  - start of line + \"## Label...\" then newline, OR\n  //  - start of line + \"Label...\" followed by a colon\n  // Then capture everything (non-greedy) until the next boundary or end.\n  const re = new RegExp(\n    `^(?:##\\\\s*${labelPattern}[^\\\\n]*\\\\n|${labelPattern}[^\\\\n]*:\\\\s*\\\\n?)` +\n      `([\\\\s\\\\S]*?)(?=${nextBoundary}|$)`,\n    \"m\"\n  );\n  const m = text.match(re);\n  return m ? m[1].trim() : \"\";\n}\n\n// --- 3) Markdown → Airtable-friendly plaintext\nfunction mdToPlain(s) {\n  if (!s) return \"\";\n\n  // Normalize Windows EOLs and trim trailing spaces\n  s = s.replace(/\\r/g, \"\").replace(/[ \\t]+\\n/g, \"\\n\");\n\n  // Convert list bullets to a consistent bullet\n  s = s.replace(/^\\s*[-*]\\s+/gm, \"• \");\n\n  // Strip markdown links but keep anchor text: [text](url) -> text\n  s = s.replace(/\\[([^\\]]+)\\]\\((?:[^)]+)\\)/g, \"$1\");\n\n  // Remove bold/italics/inline-code markers\n  s = s.replace(/(\\*\\*|__|\\*|_|`)/g, \"\");\n\n  // Remove heading hashes if any slipped in\n  s = s.replace(/^\\s*#{1,6}\\s*/gm, \"\");\n\n  // Collapse 3+ newlines to max 2\n  s = s.replace(/\\n{3,}/g, \"\\n\\n\");\n\n  return s.trim();\n}\n\n// --- 4) Extract sections (USP label variants supported)\nconst executiveRaw = grabSection(\"Executive\\\\s*Summary(?:\\\\s*\\\\(<=?\\\\s*\\\\d+\\\\s*words?\\\\))?\");\nconst audienceRaw  = grabSection(\"Target\\\\s*Audience\");\nconst painsRaw     = grabSection(\"Pain\\\\s*Points\");\nconst uspRaw       = grabSection(\"(?:Unique\\\\s*Selling\\\\s*Proposition(?:\\\\s*\\\\(USP\\\\))?|USP)\");\nconst fullRaw      = text;\n\n// --- 5) Clean for Airtable\nconst ExecutiveSummary = mdToPlain(executiveRaw);\nconst TargetAudience   = mdToPlain(audienceRaw);\nconst PainPoints       = mdToPlain(painsRaw);\nconst USP              = mdToPlain(uspRaw);\nconst FullReport       = mdToPlain(fullRaw);\n\n// --- 6) Return for Airtable \"Update Record\"\nreturn [{\n  recordId: $json.recordId,  // ensure this is present upstream\n  ExecutiveSummary,          // Long text\n  TargetAudience,            // Long text (bullets preserved)\n  PainPoints,                // Long text (bullets preserved)\n  USP,                       // Long text\n  FullReport                 // Long text (entire report, plaintext)\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        208
+      ],
+      "id": "370af5ef-1e63-48ad-b5e6-9118a646a182",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appk3zsocZmCpMe6M",
+          "mode": "list",
+          "cachedResultName": "Deep Research",
+          "cachedResultUrl": "https://airtable.com/appk3zsocZmCpMe6M"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblsXqsNLNTyzLsSS",
+          "mode": "list",
+          "cachedResultName": "Table 1",
+          "cachedResultUrl": "https://airtable.com/appk3zsocZmCpMe6M/tblsXqsNLNTyzLsSS"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Get a record').item.json.id }}",
+            "Executive Summary": "={{ $json.ExecutiveSummary }}",
+            "Target Audience": "={{ $json.TargetAudience }}",
+            "Pain Points": "={{ $json.PainPoints }}",
+            "Unique Selling Proposition": "={{ $json.USP }}",
+            "Full Research Report": "={{ $json.FullReport }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Client Name",
+              "displayName": "Client Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Website URL",
+              "displayName": "Website URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Executive Summary",
+              "displayName": "Executive Summary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Target Audience",
+              "displayName": "Target Audience",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Pain Points",
+              "displayName": "Pain Points",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Unique Selling Proposition",
+              "displayName": "Unique Selling Proposition",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Full Research Report",
+              "displayName": "Full Research Report",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        624,
+        192
+      ],
+      "id": "d5f75dcf-4a43-4693-af4a-9aed07b1989e",
+      "name": "Update record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "7CWIYitnBJMr6lSU",
+          "name": "Airtable"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        624,
+        0
+      ],
+      "id": "6d0f5787-15bf-4d61-9819-d869bb1947a1",
+      "name": "Wait",
+      "webhookId": "696fa8cb-55a3-4fac-ad58-087eebca95b1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get a record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a record": {
+      "main": [
+        [
+          {
+            "node": "Post Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Request": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post Request": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Update record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Get Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "93883226-2cb8-4bf1-8b12-5d3907049ec5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "21c5d06e9a2e9af0bdfc9c1e8f894c404d4db78a60c6a307fd7ef94634692e0f"
+  },
+  "id": "PRYcamTuVQOHvve7",
+  "tags": []
+}
