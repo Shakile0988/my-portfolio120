@@ -1,0 +1,1367 @@
+{
+  "name": "AI Calendar Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        864,
+        2080
+      ],
+      "id": "68238b73-e136-41ed-8f7d-b9dd6b19e545",
+      "name": "New Email Received",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "CObrRJA4HDvoCnjw",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.text }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "Date",
+              "description": "Extract the date of the event",
+              "required": true
+            },
+            {
+              "name": "Time",
+              "description": "=Extract the time and duration of the event\n\n# Final Reminder\nThe current date/time is {{ $now }}",
+              "required": true
+            },
+            {
+              "name": "Location",
+              "description": "Extract the location of the event including the full address"
+            },
+            {
+              "name": "Purpose",
+              "description": "Extract the purpose of the event",
+              "required": true
+            },
+            {
+              "name": "Instructions",
+              "description": "=Extract the instructions about the appointment, if any\n\nThis field is not required, if you can't find the purpose of the event, output \"Not Provided\""
+            },
+            {
+              "name": "Attendees",
+              "description": "=Extract the attendees that may be going to the event, if any.\n\nThis field is not required, if you can't find the purpose of the event, output \"Not Provided\""
+            },
+            {
+              "name": "Update",
+              "description": "=Extract whether or not the user is requesting to update or change an existing event. If the user is requesting to update or change an existing event, do not create a new event.",
+              "required": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        1216,
+        1760
+      ],
+      "id": "c8a0909e-c530-470d-a32e-b6c07cc7564d",
+      "name": "Information Extractor",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        96,
+        1952
+      ],
+      "id": "523e86c1-64df-4808-80d1-f88b9528e24d",
+      "name": "Telegram Message",
+      "webhookId": "50229686-b3e3-4a87-904d-e09e325b2529",
+      "credentials": {
+        "telegramApi": {
+          "id": "W6e2Zjgfv6YurvHe",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "if ($input.first().json.message.from.id !== YOURID) {\nreturn { unauthorized: true };\n} else {\nreturn $input.all();\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        1952
+      ],
+      "id": "c28bdf81-e6eb-40d0-925d-280e5723f5dd",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        848,
+        1824
+      ],
+      "id": "467e484e-5e1e-4324-bfee-93dbd62cf5a7",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "openAiApi": {
+          "id": "qSzbGl4G4f6dLxr1",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "65dc0e86-7b69-4593-b292-f746b80368ab",
+                    "leftValue": "={{ $('Telegram Message').item.json.message.voice.mime_type }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Voice"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Telegram Message').item.json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "b3a41478-7fae-48ee-ae54-53f59cb4dc1c"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Text"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        448,
+        1952
+      ],
+      "id": "d7a3c372-291f-4c09-bc19-4e7caee27018",
+      "name": "Switch Text or Voice"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        672,
+        1824
+      ],
+      "id": "cf42859c-fabf-4083-bd74-040bb4518090",
+      "name": "Telegram File ID",
+      "webhookId": "71a3ccfc-8de3-4a40-9b4b-9c7e2be6ea30",
+      "credentials": {
+        "telegramApi": {
+          "id": "W6e2Zjgfv6YurvHe",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b3bf3001-3cb9-45ce-8bbe-56fb7c6bd4f8",
+              "name": "text",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        672,
+        2000
+      ],
+      "id": "50081936-45f3-4294-9551-b0c105d3d8cc",
+      "name": "Set Text"
+    },
+    {
+      "parameters": {
+        "chatId": "YOURID",
+        "text": "={{ $('Set Text1').item.json.text }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2432,
+        1568
+      ],
+      "id": "2204c052-2721-4ec4-a715-86bc53d874db",
+      "name": "Response",
+      "webhookId": "010202c7-1c0d-4594-9678-4f1dd39904ed",
+      "credentials": {
+        "telegramApi": {
+          "id": "W6e2Zjgfv6YurvHe",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "youremail@gmail.com",
+          "mode": "id"
+        },
+        "returnAll": true,
+        "timeMin": "={{ $fromAI(\"dayBefore\",\"the day before the date the user is requesting\")}}",
+        "timeMax": "={{ $fromAI(\"dayAfter\",\"the day after the date the user is requesting\")}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        2080,
+        2112
+      ],
+      "id": "4aa7dab7-9d77-44cf-a888-3b27d7686861",
+      "name": "Get Events",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "b1iF20fpVQB5q6Ds",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "calendar": {
+          "__rl": true,
+          "value": "youremail@gmail.com",
+          "mode": "id"
+        },
+        "eventId": "={{ $fromAI(\"eventID\",\"this is the event ID\") }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        1856,
+        2112
+      ],
+      "id": "7241505b-00cd-40e9-af51-4ec46eea3a73",
+      "name": "Delete Events",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "b1iF20fpVQB5q6Ds",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {
+          "systemMessage": "=# Overview\nYou are a personal assistant handling events and emails. If no attendees have been specified, continue creating the event without an attendee. \n\n## Tools\nCreate Event - use this tool to create events.\nGet Events - use this tool to get the events from the calendar.\nDelete Events - use this tool to delete events. You must use the 'Get Events' tool before deleting.\nUpdate Events - use this tool to update or change events. You do not need to have attendees. You must use the 'Get Events' tool before updating.\n\n## Final Reminders\nSign off emails as 'Love, AI'\nHere is the current date/time: {{ $now }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        1728,
+        1632
+      ],
+      "id": "cb75a830-08f3-4d50-8b51-b81b79a1afb7",
+      "name": "Ultimate Assistant"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "67b09e34-bb89-4089-90ef-2e1c85a49b3a",
+              "name": "text",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2048,
+        1664
+      ],
+      "id": "006c15d6-2040-4a63-98d9-c18727047d0b",
+      "name": "Set Text1"
+    },
+    {
+      "parameters": {
+        "sendTo": "youremail@gmail.com",
+        "subject": "=",
+        "emailType": "text",
+        "message": "={{ $json.text }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2224,
+        1664
+      ],
+      "id": "02a19d74-10ac-448c-89a2-7a8defbd4704",
+      "name": "Email Response",
+      "webhookId": "368401f5-071b-432d-bd2b-f122e4906928",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "CObrRJA4HDvoCnjw",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "calendar": {
+          "__rl": true,
+          "value": "youremail@gmail.com",
+          "mode": "id"
+        },
+        "eventId": "={{ $fromAI(\"eventID\",\"this is the event ID\") }}",
+        "updateFields": {
+          "attendeesUi": {
+            "values": {
+              "attendees": [
+                "={{ $fromAI(\"attendee\",\"email address of the attendee\") }}"
+              ]
+            }
+          },
+          "end": "={{ $fromAI(\"endTime\") }}",
+          "start": "={{ $fromAI(\"startTime\") }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        2288,
+        2000
+      ],
+      "id": "3992385e-2484-4b0f-9d30-151cb1f3529e",
+      "name": "Update Events",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "b1iF20fpVQB5q6Ds",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1392,
+        2000
+      ],
+      "id": "e4c1deac-85e1-409c-83e3-8591a48ecb65",
+      "name": "4.1 mini",
+      "credentials": {
+        "openAiApi": {
+          "id": "qSzbGl4G4f6dLxr1",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Event Assistant  \n### Extracts structured details (date, time, location, purpose, attendees, update intent) from the message using an information extractor, producing a reliable event object for the agent.  ",
+        "height": 864,
+        "width": 560
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        1408
+      ],
+      "id": "6bffa6d7-3d64-41d2-8efa-7ef48da6a933",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# Daily Reminders  \n### Runs each morning to pull the next 7 days of events. Formats a readable summary and sends a “has events” or “no events” update to Telegram and email for the whole family.",
+        "height": 532,
+        "width": 2560,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        32,
+        2288
+      ],
+      "id": "ac8aba25-a71b-429f-9e22-5ec5fa462b53",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      name: \"Mom and Dad\",\n      email: \"youremail@gmail.com\"\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        528,
+        2400
+      ],
+      "id": "8f21d4e2-8eb4-4a6f-9abd-47f737e99cf4",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.htmlLink }}",
+                    "rightValue": "=",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "ec760af3-15d2-421c-add2-911e3598fc88"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Has Events"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2cf74fae-a7e2-4ee0-96d1-57e59dec73e9",
+                    "leftValue": "={{ $json.htmlLink }}",
+                    "rightValue": "{{$items.length}}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notExists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "No Events"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        528,
+        2608
+      ],
+      "id": "dab0876e-fff1-497a-adf0-1686124ec2e2",
+      "name": "Check If Has Events"
+    },
+    {
+      "parameters": {
+        "jsCode": "function titleCase(str) {\n  return str.replace(/\\w\\S*/g, (txt) =>\n    txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()\n  );\n}\n\nconst events = items.map(item => {\n  const startRaw = item.json.start.dateTime || item.json.start.date;\n  const date = new Date(startRaw);\n\n  const start = date.toLocaleString(\"en-US\", {\n    timeZone: \"America/Los_Angeles\",\n    weekday: \"long\",\n    year: \"numeric\",\n    month: \"long\",\n    day: \"numeric\",\n    hour: \"2-digit\",\n    minute: \"2-digit\",\n    hour12: true\n  });\n\n  let summary = item.json.summary || \"No Title\";\n  summary = titleCase(summary);  // Capitalize each word\n\n  return `- ${summary} on ${start}`;\n});\n\nconst summaryText = `Here are your events for the week:\\n\\n${events.join(\"\\n\")}`;\n\nreturn [\n  {\n    json: {\n      message: summaryText\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1024,
+        2416
+      ],
+      "id": "ee34bdaa-93bd-4237-b2a8-2113c651ec52",
+      "name": "Reminder Of Upcoming Events For The Week"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9a73d796-2328-4678-a05e-6718d28f5863",
+              "name": "message",
+              "value": "You have no events scheduled this week.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1024,
+        2624
+      ],
+      "id": "540576f3-d958-4e3e-a58b-ad25158791d6",
+      "name": "Set No Events"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "youremail@gmail.com",
+          "mode": "id"
+        },
+        "limit": 10,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        144,
+        2608
+      ],
+      "id": "2e679eed-be44-42e9-a4b4-f8737298ccf6",
+      "name": "Get Events In Calendar (7 Days)",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "b1iF20fpVQB5q6Ds",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "YOURID",
+        "text": "={{ $json.message }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1584,
+        2624
+      ],
+      "id": "6f0a2a4e-06d9-4378-bcc3-76453b02b215",
+      "name": "No Events Telegram Message",
+      "webhookId": "010202c7-1c0d-4594-9678-4f1dd39904ed",
+      "credentials": {
+        "telegramApi": {
+          "id": "W6e2Zjgfv6YurvHe",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "youremail@gmail.com",
+        "subject": "Your Weekly Events Summary",
+        "emailType": "text",
+        "message": "={{ $json.result.text }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2368,
+        2624
+      ],
+      "id": "ba6c7230-29c2-4fd0-895d-9f0e8763e499",
+      "name": "No Events Email",
+      "webhookId": "32a5922a-9696-44b5-be75-a765099c5d97",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "CObrRJA4HDvoCnjw",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "youremail@gmail.com",
+        "subject": "Your Weekly Events Summary",
+        "emailType": "text",
+        "message": "={{ $json.result.text }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2112,
+        2416
+      ],
+      "id": "909447ea-6133-4780-a7ad-5b7d2181cfb5",
+      "name": "Send Events Email",
+      "webhookId": "32a5922a-9696-44b5-be75-a765099c5d97",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "CObrRJA4HDvoCnjw",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "YOURID",
+        "text": "={{ $json.message }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1568,
+        2416
+      ],
+      "id": "9caa2dda-f8f2-4863-bf7f-0001e561cf44",
+      "name": "Events Telegram Message",
+      "webhookId": "010202c7-1c0d-4594-9678-4f1dd39904ed",
+      "credentials": {
+        "telegramApi": {
+          "id": "W6e2Zjgfv6YurvHe",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        144,
+        2400
+      ],
+      "id": "d9be1ccb-3c45-4d4f-ab3a-c0f93dfc16ca",
+      "name": "Scheduled at 9am Everyday"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "youremail@gmail.com",
+          "mode": "id"
+        },
+        "start": "={{ $fromAI(\"startTime\") }}",
+        "end": "={{ $fromAI(\"endTime\") }}",
+        "additionalFields": {
+          "attendees": [],
+          "summary": "={{ $fromAI(\"eventTitle\") }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        1648,
+        2048
+      ],
+      "id": "76324844-da1d-4fe9-8e14-e1229efbbece",
+      "name": "Create Event",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "b1iF20fpVQB5q6Ds",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "if ($input.first().json.message.from.id !== YOURID) {\nreturn { unauthorized: true };\n} else {\nreturn $input.all();\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        272,
+        1680
+      ],
+      "id": "e9e3ab26-7a02-4b20-bf62-946aef38b096",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        864,
+        1456
+      ],
+      "id": "c42b8125-892b-4627-90c2-4a4912a8dd02",
+      "name": "Transcribe a recording1",
+      "credentials": {
+        "openAiApi": {
+          "id": "qSzbGl4G4f6dLxr1",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "65dc0e86-7b69-4593-b292-f746b80368ab",
+                    "leftValue": "={{ $('Palmer Telegram Message').item.json.message.voice.mime_type }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Voice"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Palmer Telegram Message').item.json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "b3a41478-7fae-48ee-ae54-53f59cb4dc1c"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Text"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        432,
+        1680
+      ],
+      "id": "e2e94a76-84c2-44a7-9715-aa7e46eb3beb",
+      "name": "Switch Text or Voice1"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        672,
+        1456
+      ],
+      "id": "8d4f17bf-004a-48f0-bf4e-18e85387475d",
+      "name": "Telegram File ID1",
+      "webhookId": "71a3ccfc-8de3-4a40-9b4b-9c7e2be6ea30",
+      "credentials": {
+        "telegramApi": {
+          "id": "W6e2Zjgfv6YurvHe",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b3bf3001-3cb9-45ce-8bbe-56fb7c6bd4f8",
+              "name": "text",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        672,
+        1648
+      ],
+      "id": "0f319802-a77e-4b81-bb6d-02fe6184f9cd",
+      "name": "Set Text2"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        96,
+        1680
+      ],
+      "id": "a91f41fa-40a0-456d-acc3-e7b182102d84",
+      "name": "Palmer Telegram Message",
+      "webhookId": "50229686-b3e3-4a87-904d-e09e325b2529",
+      "credentials": {
+        "telegramApi": {
+          "id": "W6e2Zjgfv6YurvHe",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Family Members Input  \n**Takes event requests from Telegram (text or voice)\nand GmailVoice is transcribed, messages are anonymized,\nand all inputs are normalized to clean text for the assistant**",
+        "height": 864,
+        "width": 992,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        32,
+        1408
+      ],
+      "id": "36956e34-bfdb-4ac5-86e7-a70b5a6a94be",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "# AI Calendar Agent",
+        "height": 1504,
+        "width": 2592,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        16,
+        1328
+      ],
+      "id": "b5096435-ca5d-47f3-8ea7-8d95fe57c58c",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "# Calendar Assistant  \n### An AI agent decides whether to create, get, update, or delete Google Calendar events. It then generates a clear confirmation message and sends responses via email and Telegram.  ",
+        "height": 864,
+        "width": 976,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1616,
+        1408
+      ],
+      "id": "ab5a1f63-e92f-47ab-98c3-ec43b757afb7",
+      "name": "Sticky Note4"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "New Email Received": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Message": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Switch Text or Voice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch Text or Voice": {
+      "main": [
+        [
+          {
+            "node": "Telegram File ID",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram File ID": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Text": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Events": {
+      "ai_tool": [
+        [
+          {
+            "node": "Ultimate Assistant",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Events": {
+      "ai_tool": [
+        [
+          {
+            "node": "Ultimate Assistant",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Ultimate Assistant",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ultimate Assistant": {
+      "main": [
+        [
+          {
+            "node": "Set Text1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Text1": {
+      "main": [
+        [
+          {
+            "node": "Email Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Response": {
+      "main": [
+        [
+          {
+            "node": "Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Events": {
+      "ai_tool": [
+        [
+          {
+            "node": "Ultimate Assistant",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "4.1 mini": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Ultimate Assistant",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Get Events In Calendar (7 Days)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If Has Events": {
+      "main": [
+        [
+          {
+            "node": "Reminder Of Upcoming Events For The Week",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set No Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reminder Of Upcoming Events For The Week": {
+      "main": [
+        [
+          {
+            "node": "Events Telegram Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Events In Calendar (7 Days)": {
+      "main": [
+        [
+          {
+            "node": "Check If Has Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set No Events": {
+      "main": [
+        [
+          {
+            "node": "No Events Telegram Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "No Events Telegram Message": {
+      "main": [
+        [
+          {
+            "node": "No Events Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Events Telegram Message": {
+      "main": [
+        [
+          {
+            "node": "Send Events Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scheduled at 9am Everyday": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Event": {
+      "ai_tool": [
+        [
+          {
+            "node": "Ultimate Assistant",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Switch Text or Voice1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch Text or Voice1": {
+      "main": [
+        [
+          {
+            "node": "Telegram File ID1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Text2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram File ID1": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording1": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Text2": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Palmer Telegram Message": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f2e0e3c1-22fd-4ca9-b2e3-2dbb373b4827",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6f4c60d7d3a664b14542aa34a3002201fd330d91b96ef90bbc9a90a7fc9e3b7c"
+  },
+  "id": "cDISBZ2RtUlS1cwk",
+  "tags": []
+}
